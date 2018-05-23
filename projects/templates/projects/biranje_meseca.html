@@ -1,0 +1,31 @@
+{% extends 'projects/base.html' %}
+{% block title %} - Biranje meseca {% endblock %}
+{% block content %}
+{% load staticfiles %}
+{% load widget_tweaks %}
+{% if messages %}
+<ul class="messages">
+  {% for message in messages %}
+  <li style="color:red;" {% if message.tags == "success" %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+<div class="container">
+    <div class="col-sm-12 col-md-7">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h3>Izaberi mesec</h3>
+                    <form class="form-horizontal" method="post" novalidate>
+                        {% csrf_token %}
+                        {% include 'projects/form_template.html' %}
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus-sign"></span>Potvrdi</button>
+                            </div>
+                        </div>
+                    </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

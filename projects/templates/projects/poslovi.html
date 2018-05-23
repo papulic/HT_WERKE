@@ -1,0 +1,169 @@
+{% extends 'projects/base.html' %}
+{% block title %} - Details {% endblock %}
+{% block projects_active %}active{% endblock %}
+{% block content %}
+
+<div class="container">
+    {% if messages %}
+    <ul class="messages">
+    {% for message in messages %}
+    <li style="color:red;" {% if message.tags == "success" %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+
+     <div class="col-sm-12">
+         <br>
+         <a href="{% url 'projects:posao-update' project_id %}">
+            <button type="button" class="btn btn-primary">
+                <span class="glyphicon glyphicon-pencil"></span>&nbsp; Promeni detalje o projektu
+            </button>
+         </a>
+         <a href="{% url 'projects:prihod-add' project_id %}">
+            <button type="button" class="btn btn-success">
+                <span class="glyphicon glyphicon-plus-sign"></span>&nbsp; Dodaj prihod
+            </button>
+         </a>
+         <a href="{% url 'projects:rashod-add' project_id %}">
+            <button type="button" class="btn btn-danger">
+                <span class="glyphicon glyphicon-plus-sign"></span>&nbsp; Dodaj rashod
+            </button>
+         </a>
+     </div>
+     <div class="col-sm-8">
+         <div class="well">
+            <div class="row">
+                <h1>{{ posao.ime }}</h1>
+            </div>
+            <div class="row">
+                <h3>opis: {{ posao.opis }}</h3>
+            </div>
+         </div>
+         <h3>Finansije</h3>
+         <div class="table-div">
+             <table class="table">
+                <thead>
+                <tr>
+                    <th><font color="red">Rashodi</font></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for rashod in rashodi %}
+                <tr class="danger">
+                    <td>{{ rashod.vrsta }}</td>
+                    <td>{{ rashod.opis }}</td>
+                    <td>{{ rashod.kolicina }}</td>
+                    <td>
+                        <a href="{% url 'projects:rashod-delete' project_id rashod.id %}">
+                            <button type="button" class="btn btn-danger" onclick="clicked(event)" style="float: right">
+                                <span class="glyphicon glyphicon-plus-sign"></span>&nbsp; Obrisi rashod
+                            </button>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                <td><strong>Ukupni rashodi:</strong></td>
+                <td></td>
+                <td><strong>{{ ukupni_rashodi }}</strong></td>
+                </tbody>
+             </table>
+         </div>
+         <div class="table-div bottom-border">
+             <table class="table">
+                <thead>
+                <tr>
+                    <th><font color="green">Prihodi</font></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for prihod in prihodi %}
+                <tr class="success">
+                    <td>{{ prihod.vrsta }}</td>
+                    <td>{{ prihod.opis }}</td>
+                    <td>{{ prihod.kolicina }}</td>
+                    <td>
+                        <a href="{% url 'projects:prihod-delete' project_id prihod.id %}">
+                            <button type="button" class="btn btn-danger" onclick="clicked(event)" style="float: right">
+                                <span class="glyphicon glyphicon-plus-sign"></span>&nbsp; Obrisi prihod
+                            </button>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                <td><strong>Ukupni prihodi:</strong></td>
+                <td></td>
+                <td><strong>{{ ukupni_prihodi }}</strong></td>
+                </tbody>
+             </table>
+         </div>
+         <h4><strong>Dobit: <span style="float: right">{{ dobit }}</span></strong></h4><br>
+         <h3>Radnici na projektu</h3>
+         <form role="form" action="" method="post" enctype="multipart/form-data">
+             {% csrf_token %}
+             <div class="table-div">
+                 <table class="table">
+                     <thead>
+                     <tr>
+                         <th>Radnik</th>
+                         <th>Zanimanje</th>
+                         <th>Skini sa projekta</th>
+                     </tr>
+                     </thead>
+                     <tbody>
+                     {% for radnik in posao.radnik_set.all %}
+                     <tr>
+                         <td>{{ radnik.ime.upper }}</td>
+                         <td>* {% for j in radnik.zanimanja.all %}{{ j }} * {% endfor %}</td>
+                         <td>
+                             <input type='checkbox' name='listskini' value='{{radnik.id}}' id='{{radnik.id}}' />
+                             <span><label class='list' for='{{radnik.id}}'></label></span>
+                         </td>
+                     </tr>
+                    {% endfor %}
+                     <tr>
+                         <td></td>
+                         <td></td>
+                         <td><button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-minus-sign"></span> Skini sa projekta</button></td>
+                     </tr>
+                     </tbody>
+                 </table>
+             </div>
+         </form>
+     </div>
+     <div class="col-sm-4 left-border">
+         <h3>Dostupni radnici</h3>
+         <form method="get">
+             {{ filter.form.as_p }}
+             <button type="submit" class="btn btn-default">Potvrdi</button>
+         </form>
+         <form role="form" action="" method="post" enctype="multipart/form-data">
+             {% csrf_token %}
+             {% if dostupni_radnici %}
+             <hr>
+             {% for radnik in filter.qs %}
+             {% if radnik.dostupan == True %}
+             <li><input type='checkbox' name='listdodaj' value='{{radnik.id}}' id='{{radnik.id}}' />
+                 <span><label class='list' for='{{radnik.id}}'>{{radnik.ime.upper}} - * {% for j in radnik.zanimanja.all %}{{ j }} * {% endfor %}</label></span>
+             </li>
+             {% endif %}
+             {% endfor %}
+             <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus-sign"></span> Dodaj na projekat</button>
+             {% else %}
+             <h3>Nema dostupnih radnika</h3>
+             {% endif %}
+         </form>
+     </div>
+</div>
+<script>
+function clicked(e)
+{
+    if(!confirm('Sigurno želite obrisati?'))e.preventDefault();
+}
+</script>
+{% endblock %}

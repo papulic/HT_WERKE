@@ -1,0 +1,67 @@
+{% extends 'projects/base.html' %}
+{% block title %} - Poslovi {% endblock %}
+{% block content %}
+{% load staticfiles %}
+
+<div class="container">
+    <h3>Poslovi</h3>
+    {% if messages %}
+    <ul class="messages">
+    {% for message in messages %}
+    <li style="color:red;" {% if message.tags == "success" %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+    {% if poslovi %}
+    <div class="row">
+        <div class="col-sm-12" style="padding-bottom: 15px;">
+            <br>
+            <a href="{% url 'projects:project-add' %}">
+                <button type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-plus"></span>&nbsp; Dodaj posao
+                </button>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-sm-12">
+        <div class='container' id="table">
+            <div class="table-div">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Ime</th>
+                        <th>Opis</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for posao in poslovi %}
+                    <tr>
+                        <td><a href="{% url 'projects:posao' posao.id %}">{{ posao.ime }}</a></td>
+                        <td>{{ posao.opis }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="row">
+        <div class="col-sm-12" style="padding-bottom: 15px;">
+            <br>
+            <a href="{% url 'projects:project-add' %}">
+                <button type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-plus"></span>&nbsp; Dodaj posao
+                </button>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+
+

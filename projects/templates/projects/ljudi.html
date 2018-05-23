@@ -1,0 +1,148 @@
+{% extends 'projects/base.html' %}
+{% block title %} - Ljudi {% endblock %}
+{% block content %}
+{% load staticfiles %}
+
+{% load widget_tweaks %}
+
+<div class="container">
+    <h3>Radnici</h3>
+    {% if messages %}
+    <ul class="messages">
+    {% for message in messages %}
+    <li style="color:red;" {% if message.tags == "success" %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+    <div class="row">
+        <br>
+        <a href="{% url 'projects:radnik-add' %}">
+            <button type="button" class="btn btn-success">
+                <span class="glyphicon glyphicon-plus"></span>&nbsp; Dodaj radnika
+            </button>
+        </a>
+        <a href="{% url 'projects:zanimanje-add' %}">
+            <button type="button" class="btn btn-warning">
+                <span class="glyphicon glyphicon-plus"></span>&nbsp; Dodaj zanimanje
+            </button>
+        </a>
+        <a href="{% url 'projects:biranje_meseca' %}" style="float: right">
+            <button type="button" class="btn btn-warning">
+                <span class="glyphicon glyphicon-calendar"></span>&nbsp; Mesecni izvod radnika
+            </button>
+        </a>
+    </div>
+    <hr style="height:1px;border:none;color:#333;background-color:#333;" />
+
+    {% if radnici %}
+    <div class="well">
+        <form method="get">
+            <h4 style="margin-top: 0">Filter</h4>
+            <div class="row">
+                <div class="form-group col-sm-4 col-md-3">
+                    {{ filter.form.zanimanja.label_tag }}
+                    {% render_field filter.form.zanimanja class="form-control" %}
+                </div>
+                <div class="form-group col-sm-4 col-md-3">
+                    {{ filter.form.dostupan.label_tag }}
+                    {% render_field filter.form.dostupan class="form-control" %}
+                </div>
+                <div class="form-group col-sm-4 col-md-3">
+                    {{ filter.form.posao.label_tag }}
+                    {% render_field filter.form.posao class="form-control" %}
+                </div>
+                <div class="form-group col-sm-4 col-md-3">
+                    {{ filter.form.ugovor_vazi_do.label_tag }}
+                    {% render_field filter.form.ugovor_vazi_do class="form-control" %}
+                </div>
+            </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-search"></span> Potvrdi
+                </button>
+        </form>
+    </div>
+    <hr>
+    <div class='container' id="table">
+        <div class="table-div">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Ime</th>
+                    <th>Zanimanja</th>
+                    <th>Dostupnost</th>
+                    <th>Trenutno na poslu</th>
+                    <th>Satnica</th>
+                    <th>Ugovor važi do</th>
+                    <th>Dana do isteka ugovora</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for radnik in filter.qs %}
+                    {% if radnik.dostupan == True %}
+                    <tr class="success">
+                    {% else %}
+                    <tr class="danger">
+                    {% endif %}
+                        <td><a href="{% url 'projects:radnik-detail' radnik.id %}">
+                                <button type="button" class="btn btn-link">
+                                    <span class="glyphicon glyphicon-user"></span>&nbsp; {{ radnik.ime }}
+                                </button>
+                            </a></td>
+                        <td>* {% for j in radnik.zanimanja.all %}{{ j }} * {% endfor %}</td>
+                        {% if radnik.dostupan == True %}
+                        <td>Dostupan</td>
+                        {% else %}
+                        <td>Nedostupan</td>
+                        {% endif %}
+                        <td>{% if radnik.posao != None %}
+                        <a href="{% url 'projects:posao' radnik.posao.id %}">{{ radnik.posao }}</a>
+                        {% else %}
+                        ---------------------
+                        {% endif %}</td>
+                        <td>{{ radnik.satnica }} kn</td>
+                        <td {% if radnik.dana_do_isteka_ugovora < 15 %}style="color:red"{% endif %}>{{ radnik.ugovor_vazi_do }}</td>
+                        <td {% if radnik.dana_do_isteka_ugovora < 15 %}style="color:red"{% endif %}>{{ radnik.dana_do_isteka_ugovora }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <hr style="height:1px;border:none;color:#333;background-color:#333;" />
+    {% endif %}
+    {% if radnici_otkaz %}
+    <h4>Radnici kojima je prestao radni odnos</h4>
+    <div class='container' id="table">
+        <div class="table-div">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Ime</th>
+                    <th>oib</th>
+                    <th>Zanimanja</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for radnik in radnici_otkaz %}
+                    <tr class="danger">
+                        <td><a href="{% url 'projects:radnik-update' radnik.id %}">
+                                <button type="button" class="btn btn-link">
+                                    <span class="glyphicon glyphicon-user"></span>&nbsp; {{ radnik.ime }}
+                                </button>
+                            </a></td>
+                        <td>{{ radnik.oib }}</td>
+                        <td>* {% for j in radnik.zanimanja.all %}{{ j }} * {% endfor %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endif %}
+</div>
+{% endblock %}
+
+
+
+

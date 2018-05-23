@@ -1,0 +1,92 @@
+{% extends 'projects/base.html' %}
+{% block title %} - Detalji - radnik {% endblock %}
+{% block projects_active %}active{% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li style="color:red;" {% if message.tags == "success" %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    </div>
+    <div class="row">
+    <h1>{{ radnik.ime }}</h1>
+        {% if radnik.u_radnom_odnosu %}
+        <h3><font color="green"> Radnik je u radnom odnosu</font></h3>
+        <h4>Dana do isteka ugovora: {{ radnik.dana_do_isteka_ugovora }}</h4>
+        {% if radnik.posao.ime %}
+        <h4>Trenutno na poslu: {{ radnik.posao.ime }}</h4>
+        {% else %}
+        <h4><font color="green"> Radnik je dostupan!</font></h4>
+        {% endif %}
+        {% else %}
+        <h3><font color="red"><strong> Radnik nije u radnom odnosu</strong></font></h3>
+        {% endif %}
+        <br>
+        <a href="{% url 'projects:radnik-update' radnik_id %}">
+            <button type="button" class="btn btn-primary">
+                <span class="glyphicon glyphicon-pencil"></span>&nbsp; Promeni detalje o radniku
+            </button>
+        </a>
+    </div>
+    <div class="row">
+        <div class="col-xs-6">
+            <h4>oib:</h4>
+            <h3>{{ radnik.oib }}</h3>
+            <hr>
+            <h4>Početak radnog odnosa:</h4>
+            <h3>{{ radnik.poceo_raditi }}</h3>
+            <hr>
+            <h4>Ugovor ističe:</h4>
+            <h3>{{ radnik.ugovor_vazi_do }}</h3>
+            <hr>
+            <h4>Zanimanja radnika:</h4>
+            {% for zanimanje in radnik.zanimanja.all %}
+            <h3>{{ zanimanje }}</h3>
+            {% endfor %}
+            <hr>
+        </div>
+        <div class="col-xs-6">
+            <h4>Satnica:</h4>
+            <h3><strong>{{ radnik.satnica }}</strong> kn</h3>
+            <hr>
+            <h4>br odela:</h4>
+            {% if radnik.broj_odela != None %}
+            <h3>{{ radnik.broj_odela }}</h3>
+            {% else %}
+            <p><font color="red"> Nije uneto</font></p>
+            {% endif %}
+            <hr>
+            <h4>br cipela:</h4>
+            {% if radnik.broj_cipela != None %}
+            <h3>{{ radnik.broj_cipela }}</h3>
+            {% else %}
+            <p><font color="red"> Nije uneto</font></p>
+            {% endif %}
+            <hr>
+            <h4>tel:</h4>
+            {% if radnik.broj_telefona != "" %}
+            <h3>{{ radnik.broj_telefona }}</h3>
+            {% else %}
+            <p><font color="red"> Nije uneto</font></p>
+            {% endif %}
+            <hr>
+            <h4>Zadužena oprema:</h4>
+            {% if radnik.zaduzena_oprema != "" %}
+            <h3>{{ radnik.zaduzena_oprema }}</h3>
+            {% else %}
+            <p><font color="red"> Nije uneto</font></p>
+            {% endif %}
+            <hr>
+        </div>
+    </div>
+    <div class="col-xs-12">
+        <h4>Komentar:</h4>
+            <h5>{{ radnik.komentar }}</h5>
+    </div>
+</div>
+{% endblock %}

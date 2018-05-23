@@ -1,0 +1,116 @@
+{% extends 'projects/base.html' %}
+{% block title %} - Ljudi {% endblock %}
+{% block content %}
+{% load staticfiles %}
+{% load widget_tweaks %}
+
+<div class="container">
+    <h3>Mesečni pregled za {{ mesec }}.{{ godina }}</h3>
+    {% if messages %}
+    <ul class="messages">
+    {% for message in messages %}
+    <li style="color:red;" {% if message.tags == "success" %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+    <div class="row">
+        <br>
+        <div class="col-sm-6">
+                <p><font style="background-color: #07d3f7">plava</font> bolovanje</p>
+                <p><font style="background-color: #eef707">žuta</font> dozvoljeno odsustvo</p>
+                <p><font style="background-color: #f70707">crvena</font> nedozvoljeno odsustvo</p>
+        </div>
+        <div class="col-sm-6">
+            <a href="{% url 'projects:biranje_meseca' %}" style="float: right">
+                <button type="button" class="btn btn-warning">
+                    <span class="glyphicon glyphicon-calendar"></span>&nbsp; Izaberi drugi mesec
+                </button>
+            </a>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <br>
+        <div class="col-sm-6">
+            <p>Pritiskom na dugme "Dodaj dane" kreiraju se svi dani koje radnik nema do današnjeg datuma, <strong>ZA SVAKOG RADNIKA</strong> koji je u radnom odnosu! To može malo potrajati, sačekajte povratnu poruku!</p>
+        </div>
+        <div class="col-sm-6">
+        <a href="{% url 'projects:dodaj_dane' mesec godina %}" style="float: right">
+            <button type="button" class="btn btn-warning">
+                <span class="glyphicon glyphicon-calendar"></span>&nbsp; Dodaj dane
+            </button>
+        </a>
+        </div>
+    </div>
+    <hr style="height:1px;border:none;color:#333;background-color:#333;" />
+    {% for radnik in radnici %}
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Ime</th>
+            <th>Trenutno na poslu</th>
+            <th>Satnica</th>
+            {% for dan in Dani %}
+                {% if dan.radnik == radnik %}
+                <th>{{ dan.datum.day }}</th>
+                {% endif %}
+                {% endfor %}
+            <th>Ukupno</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="{% url 'projects:radnik-detail' radnik.id %}">
+                        <button type="button" class="btn btn-link">
+                            <span class="glyphicon glyphicon-user"></span>&nbsp; {{ radnik.ime }}
+                        </button>
+                    </a></td>
+                <td>{% if radnik.posao != None %}
+                <a href="{% url 'projects:posao' radnik.posao.id %}">{{ radnik.posao }}</a>
+                {% else %}
+                ---------
+                {% endif %}</td>
+                <td>{{ radnik.satnica }} kn</td>
+
+                {% for dan in Dani %}
+                {% if dan.radnik == radnik %}
+
+                {% if dan.bolovanje %}
+                <td bgcolor="#07d3f7">
+                {% elif dan.dozvoljeno_odsustvo %}
+                <td bgcolor="#eef707">
+                {% elif dan.nedozvoljeno_odsustvo %}
+                <td bgcolor="#f70707">
+                {% elif dan.radio_sati != 0.0 %}
+                <td bgcolor="#3fff3f">
+                {% else %}
+                <td>
+                {% endif %}
+                    <a href="{% url 'projects:dan-update' dan.id %}">
+                        <font color="black"><strong>
+                        {{ dan.radio_sati }}
+                        </strong></font>
+                    </a>
+                </td>
+
+                {% endif %}
+                {% endfor %}
+                {% for k, v in ukupno.items %}
+                {% if k == radnik.id %}
+                <td><strong>{{ v }}</strong></td>
+                {% endif %}
+                {% endfor %}
+            </tr>
+
+
+        </tbody>
+    </table>
+    <hr style="height:1px;border:none;color:#333;background-color:#333;" />
+    {% endfor %}
+    <h3 style="float: right">Ukupno: {{ svi }}</h3>
+</div>
+
+
+{% endblock %}
+
+

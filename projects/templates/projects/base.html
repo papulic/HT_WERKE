@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="sr"  lang="sr">
+<head>
+    <title>HT WERKE{% block title %}{% endblock %}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% load staticfiles %}
+    <link rel="shortcut icon" type="image/png" href="{%  static 'projects/favicon.ico' %}"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Satisfy' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="{% static 'projects/style.css' %}"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#topNavBar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="{% url 'projects:index' %}" class="navbar-left"><img src="{%  static 'projects/logo.png' %}"></a>
+            <a class="navbar-brand"></a>
+            <a class="navbar-brand" href="{% url 'projects:index' %}"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Poslovi  </a>
+            <a class="navbar-brand" href="{% url 'projects:ljudi' %}"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Radnici  </a>
+            <a class="navbar-brand" href="{% url 'projects:vozila' %}"><span class="glyphicon glyphicon-road" aria-hidden="true"></span> Vozila  </a>
+            <a class="navbar-brand" href="#"><span class="glyphicon glyphicon-euro" aria-hidden="true"></span> Finansije  </a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="topNavBar">
+
+
+            <ul class="nav navbar-nav navbar-right">
+
+                <li class="">
+                    <a href="{% url 'projects:logout_user' %}">
+                        <span class="glyphicon glyphicon-off"
+                              aria-hidden="true"></span>&nbsp; Logout
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+
+    </div>
+</nav>
+
+{% block content %}
+
+{% endblock %}
+
+<hr>
+  <footer class="page-footer font-small blue pt-4 mt-4">
+    <div class="footer-copyright py-3 text-center">
+        © 2018 Copyright: OSwebdev
+        <a href="mailto:papulic@gmail.com?Subject=Hello%20OSwebdev" target="_top">papulic@gmail.com</a>
+    </div>
+  </footer>
+</body>
+
+</html>
