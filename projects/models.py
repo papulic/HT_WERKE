@@ -89,7 +89,6 @@ class Prihodi(models.Model):
     opis = models.CharField(max_length=150, blank=True)
     kolicina = models.FloatField(max_length=10, default=0.0)
     posao = models.ForeignKey(Poslovi, on_delete=models.CASCADE)
-    dan = models.ForeignKey(Dan, null=True, blank=True)
 
     def __unicode__(self):
         return self.vrsta
@@ -102,7 +101,6 @@ class Rashodi(models.Model):
     opis = models.CharField(max_length=150, blank=True)
     kolicina = models.FloatField(max_length=10, default=0.0)
     posao = models.ForeignKey(Poslovi, on_delete=models.CASCADE)
-    dan = models.ForeignKey(Dan, null=True, blank=True)
 
     def __unicode__(self):
         return self.vrsta

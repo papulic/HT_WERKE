@@ -234,7 +234,14 @@ def radnik_detail(request, radnik_id):
         return render(request, 'projects/login.html')
     else:
         radnik = get_object_or_404(Radnik, pk=radnik_id)
-        print radnik.posao
+        current_date = datetime.date.today()
+        preostalo_dana = radnik.ugovor_vazi_do - current_date
+        radnik.dana_do_isteka_ugovora = preostalo_dana.days
+        if radnik.posao != None:
+            radnik.dostupan = False
+        else:
+            radnik.dostupan = True
+        radnik.save()
         return render(request, 'projects/radnik_detalji.html', {
             'radnik': radnik,
             'radnik_id': radnik_id,
@@ -262,36 +269,30 @@ def dan_update(request, dan_id):
         dan.save()
         if dan.posao:
             if dan.posao.dogovoreni_radni_sati != 0.0:
-                # rashodi = Rashodi.objects.all()
-                # for rashod in rashodi:
-                #     if rashod.dan == dan:
-                #         rashod.delete()
                 try:
-                    rashod = Rashodi.objects.get(dan=dan)
-                    rashod.delete()
+                    rashod = Rashodi.objects.get(vrsta="AUTOMATSKA_SATNICA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id))
                 except:
                     pass
-                rashod = Rashodi()
-                rashod.posao = dan.posao
-                rashod.kolicina = dan.radio_sati * dan.radnik.satnica
-                rashod.vrsta = "Satnica radnika {radnik} za dan {dan}.{mesec}.{godina}".format(radnik=dan.radnik.ime, dan=dan.datum.day, mesec=dan.datum.month, godina=dan.datum.year)
-                rashod.dan = dan
+                try:
+                    rashod.kolicina += dan.radio_sati * dan.radnik.satnica
+                except:
+                    rashod = Rashodi()
+                    rashod.posao = dan.posao
+                    rashod.kolicina = dan.radio_sati * dan.radnik.satnica
+                    rashod.vrsta = "AUTOMATSKA_SATNICA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id)
                 rashod.save()
                 ###############################################################
-                # prihodi = Prihodi.objects.all()
-                # for prihod in prihodi:
-                #     if prihod.dan == dan:
-                #         prihod.delete()
                 try:
-                    prihod = Prihodi.objects.get(dan=dan)
-                    prihod.delete()
+                    prihod = Prihodi.objects.get(vrsta="AUTOMATSKA_SATNICA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id))
                 except:
                     pass
-                prihod = Prihodi()
-                prihod.posao = dan.posao
-                prihod.kolicina = dan.posao.dogovoreni_radni_sati * dan.radio_sati
-                prihod.vrsta = "Satnica radnika {radnik} za dan {dan}.{mesec}.{godina}".format(radnik=dan.radnik.ime, dan=dan.datum.day, mesec=dan.datum.month, godina=dan.datum.year)
-                prihod.dan = dan
+                try:
+                    prihod.kolicina += dan.posao.dogovoreni_radni_sati * dan.radio_sati
+                except:
+                    prihod = Prihodi()
+                    prihod.posao = dan.posao
+                    prihod.kolicina = dan.posao.dogovoreni_radni_sati * dan.radio_sati
+                    prihod.vrsta = "AUTOMATSKA_SATNICA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id)
                 prihod.save()
         return HttpResponseRedirect(reverse('projects:monthview-workers', args=(dan.datum.month, dan.datum.year)))
     context = {
@@ -336,14 +337,8 @@ def create_prihod(request, project_id):
         return render(request, 'projects/create_prihod.html', context)
 
 def prihod_delete(request, project_id, prihod_id):
-    # prihod = Prihodi.objects.get(pk=prihod_id)
     prihod = get_object_or_404(Prihodi, id=prihod_id)
     prihod.delete()
-    try:
-        rashod = Rashodi.objects.get(dan=prihod.dan)
-        rashod.delete()
-    except:
-        pass
     return HttpResponseRedirect(reverse('projects:posao', args=(project_id)))
 
 def create_rashod(request, project_id):
@@ -367,11 +362,6 @@ def create_rashod(request, project_id):
 def rashod_delete(request, project_id, rashod_id):
     rashod = Rashodi.objects.get(pk=rashod_id)
     rashod.delete()
-    try:
-        prihod = Prihodi.objects.get(dan=rashod.dan)
-        prihod.delete()
-    except:
-        pass
     return HttpResponseRedirect(reverse('projects:posao', args=(project_id)))
 
 def create_date__old(request):
