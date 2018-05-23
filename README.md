@@ -56,6 +56,8 @@ ne moze ovako mesec zbog dodavanja novih radnika u pola meseca
 
 mesecni pregled  --> td color zavisi od dan.bolovanje ili dan.odsustvo
 
+ipak dan mora imati rashod i prihod
+
 
 
 
@@ -67,3 +69,5 @@ trebao bi svaki dan imati posebnu isplacenu sumu. Videti da li moze uneto da se 
 dan.novac = current satnica * sati. mada bi to trebalo da radi i ovako ako se posle ne menja!!!
 
 rashod mora imati pokazivac na dan kad se automatski unosi
+
+da li se pogadja posao na sat za sve radnike na projektu isti
