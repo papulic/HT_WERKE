@@ -339,6 +339,11 @@ def prihod_delete(request, project_id, prihod_id):
     # prihod = Prihodi.objects.get(pk=prihod_id)
     prihod = get_object_or_404(Prihodi, id=prihod_id)
     prihod.delete()
+    try:
+        rashod = Rashodi.objects.get(dan=prihod.dan)
+        rashod.delete()
+    except:
+        pass
     return HttpResponseRedirect(reverse('projects:posao', args=(project_id)))
 
 def create_rashod(request, project_id):
@@ -362,6 +367,11 @@ def create_rashod(request, project_id):
 def rashod_delete(request, project_id, rashod_id):
     rashod = Rashodi.objects.get(pk=rashod_id)
     rashod.delete()
+    try:
+        prihod = Prihodi.objects.get(dan=rashod.dan)
+        prihod.delete()
+    except:
+        pass
     return HttpResponseRedirect(reverse('projects:posao', args=(project_id)))
 
 def create_date__old(request):
