@@ -263,6 +263,8 @@ def posao_update(request, project_id):
 
 def dan_update(request, dan_id):
     instance = Dan.objects.get(pk=dan_id)
+    old_radio_sati = instance.radio_sati
+    old_posao = instance.posao
     form = DanForm(request.POST or None, instance=instance)
     if form.is_valid():
         dan = form.save(commit=False)
@@ -280,6 +282,8 @@ def dan_update(request, dan_id):
                     rashod.posao = dan.posao
                     rashod.kolicina = dan.radio_sati * dan.radnik.satnica
                     rashod.vrsta = "AUTOMATSKA_SATNICA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id)
+                if old_radio_sati != 0.0 and rashod.kolicina != dan.radio_sati * dan.radnik.satnica and old_posao != None:
+                    rashod.kolicina -= old_radio_sati * dan.radnik.satnica
                 rashod.save()
                 ###############################################################
                 try:
@@ -293,6 +297,8 @@ def dan_update(request, dan_id):
                     prihod.posao = dan.posao
                     prihod.kolicina = dan.posao.dogovoreni_radni_sati * dan.radio_sati
                     prihod.vrsta = "AUTOMATSKA_SATNICA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id)
+                if old_radio_sati != 0.0 and prihod.kolicina != dan.posao.dogovoreni_radni_sati * dan.radio_sati and old_posao != None:
+                    prihod.kolicina -= old_radio_sati * dan.posao.dogovoreni_radni_sati
                 prihod.save()
         return HttpResponseRedirect(reverse('projects:monthview-workers', args=(dan.datum.month, dan.datum.year)))
     context = {

@@ -37,7 +37,9 @@
                     <tbody>
                     {% for posao in poslovi %}
                     <tr>
-                        <td><a href="{% url 'projects:posao' posao.id %}">{{ posao.ime }}</a></td>
+                        <td><a href="{% url 'projects:posao' posao.id %}"><button type="button" class="btn btn-link">
+                                    <span class="glyphicon glyphicon-wrench"></span>&nbsp; {{ posao.ime }}
+                                </button></a></td>
                         <td>{{ posao.opis }}</td>
                     </tr>
                     {% endfor %}
