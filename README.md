@@ -26,3 +26,5 @@ svaki radnik da ima jos po polje: broj radnih sati za tekuci mesec, broj slobodn
 da li se pogadja posao na sat za sve radnike na projektu isti, onda automatska satnica ima smisla
 
 def delete posao, pravi se log fajl sa svim detaljima i finansijama o poslu u media dir i odma se skida (download)
+
+pregledati titlove
