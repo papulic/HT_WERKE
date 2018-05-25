@@ -43,6 +43,11 @@
             <div class="row">
                 <h1>{{ posao.ime }}</h1>
             </div>
+             {% if posao.dogovoreni_radni_sati != 0.0 %}
+             <h4>Dogovoren radni sat: {{ posao.dogovoreni_radni_sati}}</h4>
+             {% else %}
+             <h4>Ovaj posao nije dogovoren na radni sat</h4>
+             {% endif %}
             <div class="row">
                 <h3>opis: {{ posao.opis }}</h3>
             </div>

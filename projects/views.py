@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
-from .forms import UserForm, PosloviForm, RadnikForm, PrihodiForm, RashodiForm, DatumForm, DanForm, ZanimanjeForm
+from .forms import UserForm, PosloviForm, RadnikForm, PrihodiForm, RashodiForm, DatumForm, DanForm, ZanimanjeForm, VoziloForm
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
@@ -56,6 +56,7 @@ def ljudi(request):
             'radnici_otkaz': radnici_otkaz
         })
 
+
 def biranje_meseca(request):
     if not request.user.is_authenticated():
         return render(request, 'projects/login.html')
@@ -70,6 +71,7 @@ def biranje_meseca(request):
     return render(request, 'projects/biranje_meseca.html', {
             'form': form
         })
+
 
 def dodaj_dane(request, mesec, godina):
     dan_dodat = False
@@ -94,6 +96,7 @@ def dodaj_dane(request, mesec, godina):
     else:
         messages.success(request, "Svi dani do današnjeg datuma već postoje!")
     return HttpResponseRedirect(reverse('projects:monthview-workers', args=(mesec, godina)))
+
 
 def mesecni_izvod_radnika(request, mesec, godina):
     if not request.user.is_authenticated():
@@ -122,10 +125,16 @@ def vozila(request):
     if not request.user.is_authenticated():
         return render(request, 'projects/login.html')
     else:
+        current_date = datetime.date.today()
         vozila = Vozilo.objects.all()
+        istek_registracije = {}
+        for vozilo in vozila:
+            preostalo_dana = vozilo.registracija_istice - current_date
+            istek_registracije[vozilo.id] = preostalo_dana.days
 
         return render(request, 'projects/vozila.html', {
             'vozila': vozila,
+            'istek_registracije': istek_registracije
         })
 
 
@@ -154,6 +163,7 @@ def create_project(request):
         }
         return render(request, 'projects/project_form.html', context)
 
+
 def create_radnik(request):
     if not request.user.is_authenticated():
         return render(request, 'projects/login.html')
@@ -171,6 +181,7 @@ def create_radnik(request):
         }
         return render(request, 'projects/dodavanje_radnika.html', context)
 
+
 def create_zanimanje(request):
     form = ZanimanjeForm(request.POST or None)
     if request.method == 'POST':
@@ -183,6 +194,21 @@ def create_zanimanje(request):
         "form": form,
     }
     return render(request, 'projects/dodavanje_zanimanja.html', context)
+
+
+def create_vozilo(request):
+    form = VoziloForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            vozilo = form.save(commit=False)
+            vozilo.save()
+            messages.success(request, "Vozilo '{vozilo}' je dodato!".format(vozilo=vozilo.marka))
+            return HttpResponseRedirect(reverse('projects:vozila'))
+    context = {
+        "form": form,
+    }
+    return render(request, 'projects/dodavanje_vozila.html', context)
+
 
 def detail(request, project_id):
     if not request.user.is_authenticated():
@@ -229,6 +255,7 @@ def detail(request, project_id):
             'dobit': dobit,
         })
 
+
 def radnik_detail(request, radnik_id):
     if not request.user.is_authenticated():
         return render(request, 'projects/login.html')
@@ -247,6 +274,7 @@ def radnik_detail(request, radnik_id):
             'radnik_id': radnik_id,
         })
 
+
 def posao_update(request, project_id):
     instance = Poslovi.objects.get(pk=project_id)
     form = PosloviForm(request.POST or None, instance=instance)
@@ -260,6 +288,22 @@ def posao_update(request, project_id):
         'project_id': project_id,
     }
     return render(request, 'projects/posao_update_form.html', context)
+
+
+def vozilo_update(request, vozilo_id):
+    instance = Vozilo.objects.get(pk=vozilo_id)
+    form = VoziloForm(request.POST or None, instance=instance)
+    if form.is_valid():
+        vozilo = form.save(commit=False)
+        vozilo.save()
+        messages.success(request, "Podaci su ažurirani!")
+        return HttpResponseRedirect(reverse('projects:vozila'))
+    context = {
+        "form": form,
+        'vozilo_id': vozilo_id,
+    }
+    return render(request, 'projects/vozilo_update.html', context)
+
 
 def dan_update(request, dan_id):
     instance = Dan.objects.get(pk=dan_id)
@@ -308,6 +352,7 @@ def dan_update(request, dan_id):
     }
     return render(request, 'projects/dan_update.html', context)
 
+
 def radnik_update(request, radnik_id):
     instance = Radnik.objects.get(pk=radnik_id)
     form = RadnikForm(request.POST or None, instance=instance)
@@ -342,10 +387,12 @@ def create_prihod(request, project_id):
         }
         return render(request, 'projects/create_prihod.html', context)
 
+
 def prihod_delete(request, project_id, prihod_id):
     prihod = get_object_or_404(Prihodi, id=prihod_id)
     prihod.delete()
     return HttpResponseRedirect(reverse('projects:posao', args=(project_id)))
+
 
 def create_rashod(request, project_id):
     if not request.user.is_authenticated():
@@ -365,73 +412,16 @@ def create_rashod(request, project_id):
         }
         return render(request, 'projects/create_rashod.html', context)
 
+
 def rashod_delete(request, project_id, rashod_id):
     rashod = Rashodi.objects.get(pk=rashod_id)
     rashod.delete()
     return HttpResponseRedirect(reverse('projects:posao', args=(project_id)))
 
-def create_date__old(request):
-    meseci = ["januar", "februar", "mart", "april", "maj", "jun", "jul", "avgust", "septembar", "oktobar", "novembar", "decembar"]
-    mesec_postoji = False
-    months_all = Mesec.objects.all()
-    now = datetime.date.today()
-    num_days = calendar.monthrange(now.year, now.month)[1]
-    year = now.year
-    month = now.month
-    days = [datetime.date(year, month, day) for day in range(1, num_days + 1)]
-    radnici = Radnik.objects.filter(u_radnom_odnosu=True)
-    for i in months_all:
-        if i.godina == year and i.mesec == month:
-            mesec_postoji = True
-            break
-    if mesec_postoji:
-        messages.success(request, 'Ovaj mesec vec postoji!')
-        return HttpResponseRedirect(reverse('projects:ljudi'))
-    else:
-        new_month = Mesec()
-        new_month.godina = year
-        new_month.mesec = month
-        new_month.save()
-        for day in days:
-            new_day = Dan()
-            new_day.datum = day
-            new_day.mesec = new_month
-            new_day.save()
-        messages.success(request, 'Mesec {mesec} je kreiran za godinu {godina}!'.format(mesec=meseci[month], godina=year))
-        return HttpResponseRedirect(reverse('projects:ljudi'))
 
-def create_date(request):
-    meseci = ["januar", "februar", "mart", "april", "maj", "jun", "jul", "avgust", "septembar", "oktobar", "novembar", "decembar"]
-    mesec_postoji = False
-    months_all = Mesec.objects.all()
-    now = datetime.date.today()
-    num_days = calendar.monthrange(now.year, now.month)[1]
-    year = now.year
-    month = now.month
-    days = [datetime.date(year, month, day) for day in range(1, num_days + 1)]
-    current_date = datetime.date.today()
-    radnici = Radnik.objects.filter(u_radnom_odnosu=True)
-    radnici_otkaz = Radnik.objects.filter(u_radnom_odnosu=False)
-    radnici_filter = RadnikFilter(request.GET, queryset=radnici)
-    for i in months_all:
-        if i.godina == year and i.mesec == month:
-            mesec_postoji = True
-            break
-    if mesec_postoji:
-        messages.success(request, 'Ovaj mesec vec postoji!')
-        return HttpResponseRedirect(reverse('projects:ljudi'))
-    else:
-        new_month = Mesec()
-        new_month.godina = year
-        new_month.mesec = month
-        new_month.save()
-        for day in days:
-            new_day = Dan()
-            new_day.datum = day
-            new_day.mesec = new_month
-            new_day.save()
-        messages.success(request, 'Mesec {mesec} je kreiran za godinu {godina}!'.format(mesec=meseci[month], godina=year))
-        return HttpResponseRedirect(reverse('projects:ljudi'))
+def delete_posao_and_create_log(request, posao):
+    pass
+
 
 def login_user(request):
     if request.method == "POST":

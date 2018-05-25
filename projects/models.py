@@ -58,8 +58,8 @@ class Vozilo(models.Model):
     predjeni_kilometri = models.IntegerField(default=None, null=True, blank=True)
     registracija_istice = models.DateField()
     sledeci_servis = models.DateField()
-    potrosnja_goriva = models.FloatField(max_length=10)
-    opis = models.CharField(max_length=100)
+    potrosnja_goriva = models.FloatField(max_length=10, default=0.0)
+    opis = models.CharField(max_length=100, blank=True)
     trenutno_duzi = models.ForeignKey(Radnik, null=True, blank=True)
 
 
@@ -101,6 +101,7 @@ class Rashodi(models.Model):
     opis = models.CharField(max_length=150, blank=True)
     kolicina = models.FloatField(max_length=10, default=0.0)
     posao = models.ForeignKey(Poslovi, on_delete=models.CASCADE)
+    vozilo = models.ForeignKey(Vozilo, null=True, blank=True )
 
     def __unicode__(self):
         return self.vrsta

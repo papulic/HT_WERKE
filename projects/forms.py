@@ -35,6 +35,18 @@ class RadnikForm(forms.ModelForm):
             'komentar': forms.Textarea
         }
 
+class VoziloForm(forms.ModelForm):
+    registracija_istice = forms.DateField(
+        widget=forms.DateInput(format='%d.%m.%Y', attrs={'class': "datum"}), input_formats=('%d.%m.%Y', '%d/%m/%Y', '%d.%m.%y', '%d/%m/%y'))
+    sledeci_servis = forms.DateField(
+        widget=forms.DateInput(format='%d.%m.%Y', attrs={'class': "datum"}), input_formats=('%d.%m.%Y', '%d/%m/%Y', '%d.%m.%y', '%d/%m/%y'))
+    class Meta:
+        model = Vozilo
+        fields = ['marka', 'predjeni_kilometri', 'registracija_istice', 'sledeci_servis', 'potrosnja_goriva', 'trenutno_duzi', 'opis']
+        widgets = {
+            'opis': forms.Textarea
+        }
+
 class RadnikForm__old(forms.ModelForm):
     class Meta:
         model = Radnik
@@ -53,7 +65,7 @@ class PrihodiForm(forms.ModelForm):
 class RashodiForm(forms.ModelForm):
     class Meta:
         model = Rashodi
-        fields = ['vrsta', 'opis', 'kolicina']
+        fields = ['vrsta', 'opis', 'kolicina', 'vozilo']
 
 class DatumForm(forms.Form):
     mesec = forms.IntegerField(max_value=12, min_value=1)

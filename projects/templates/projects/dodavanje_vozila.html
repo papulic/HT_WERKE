@@ -1,0 +1,34 @@
+{% extends 'projects/base.html' %}
+{% block title %} - Novo vozilo{% endblock %}
+{% block projects_active %}active{% endblock %}
+
+{% block content %}
+{% if messages %}
+<ul class="messages">
+  {% for message in messages %}
+  <li style="color:red;" {% if message.tags == "success" %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+<div class="container">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3>Dodaj novo vozilo</h3>
+                    <form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <p>Datume unositi u formatu "dan.mesec.godina"</p>
+                        {% include 'projects/form_template.html' %}
+                        <div class="form-group">
+                            <div class="col-xs-offset-6 col-xs-12">
+                                <button type="submit" class="btn btn-success">Potvrdi</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
