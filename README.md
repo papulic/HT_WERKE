@@ -28,3 +28,6 @@ da li se pogadja posao na sat za sve radnike na projektu isti, onda automatska s
 def delete posao, pravi se log fajl sa svim detaljima i finansijama o poslu u media dir i odma se skida (download)
 
 pregledati titlove
+
+da li treba finansije mesecni pregled kad vec sve ima za svaki posao (ako treba za svaki dan koji nije automatski
+napravljen rashod, vozilo sipanje goriva)
