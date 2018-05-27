@@ -67,7 +67,11 @@
                 {% for rashod in rashodi %}
                 <tr class="danger">
                     <td>{{ rashod.vrsta }}</td>
-                    <td>{{ rashod.opis }}</td>
+                    {% if rashod.vozilo %}
+                    <td>{{ rashod.vozilo }}</td>
+                    {% else %}
+                    <td></td>
+                    {% endif %}
                     <td>{{ rashod.kolicina }}</td>
                     <td>
                         <a href="{% url 'projects:rashod-delete' project_id rashod.id %}">
@@ -91,14 +95,12 @@
                     <th><font color="green">Prihodi</font></th>
                     <th></th>
                     <th></th>
-                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for prihod in prihodi %}
                 <tr class="success">
                     <td>{{ prihod.vrsta }}</td>
-                    <td>{{ prihod.opis }}</td>
                     <td>{{ prihod.kolicina }}</td>
                     <td>
                         <a href="{% url 'projects:prihod-delete' project_id prihod.id %}">

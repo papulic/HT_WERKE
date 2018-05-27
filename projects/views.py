@@ -275,6 +275,20 @@ def radnik_detail(request, radnik_id):
         })
 
 
+def vozilo_detail(request, vozilo_id):
+    if not request.user.is_authenticated():
+        return render(request, 'projects/login.html')
+    else:
+        vozilo = get_object_or_404(Vozilo, pk=vozilo_id)
+        current_date = datetime.date.today()
+        preostalo_dana = (vozilo.registracija_istice - current_date).days
+        return render(request, 'projects/vozilo_detalji.html', {
+            'vozilo': vozilo,
+            'vozilo_id': vozilo_id,
+            'preostalo_dana': preostalo_dana
+        })
+
+
 def posao_update(request, project_id):
     instance = Poslovi.objects.get(pk=project_id)
     form = PosloviForm(request.POST or None, instance=instance)

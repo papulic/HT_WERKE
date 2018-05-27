@@ -60,12 +60,12 @@ class RadnikForm__old(forms.ModelForm):
 class PrihodiForm(forms.ModelForm):
     class Meta:
         model = Prihodi
-        fields = ['vrsta', 'opis', 'kolicina']
+        fields = ['vrsta', 'kolicina']
 
 class RashodiForm(forms.ModelForm):
     class Meta:
         model = Rashodi
-        fields = ['vrsta', 'opis', 'kolicina', 'vozilo']
+        fields = ['vrsta', 'kolicina', 'vozilo']
 
 class DatumForm(forms.Form):
     mesec = forms.IntegerField(max_value=12, min_value=1)

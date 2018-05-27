@@ -1,0 +1,80 @@
+{% extends 'projects/base.html' %}
+{% block title %} - Detalji - vozilo {% endblock %}
+{% block projects_active %}active{% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li style="color:red;" {% if message.tags == "success" %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    </div>
+    <div class="row">
+    <h1>{{ vozilo.marka }}</h1>
+
+        <h4>Dana do isteka registracije: {{ preostalo_dana }}</h4>
+        {% if vozilo.trenutno_duzi %}
+        <h4>Trenutno duži: {{ vozilo.trenutno_duzi }}</h4>
+        {% else %}
+        <h4><font color="green"> Vozilo je dostupno!</font></h4>
+        {% endif %}
+        <br>
+        <a href="{% url 'projects:vozilo-update' vozilo_id %}">
+            <button type="button" class="btn btn-primary">
+                <span class="glyphicon glyphicon-pencil"></span>&nbsp; Promeni detalje o vozilu
+            </button>
+        </a>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h4>Predjeni kilometri:</h4>
+            {% if vozilo.predjeni_kilometri %}
+            <h3>{{ vozilo.predjeni_kilometri }}</h3>
+            {% else %}
+            <h3>Nije uneto</h3>
+            {% endif %}
+            <hr>
+            <h4>Registracija ističe:</h4>
+            <h3>{{ vozilo.registracija_istice }}</h3>
+            <hr>
+            <h4>Sledeći servis:</h4>
+            <h3>{{ vozilo.sledeci_servis }}</h3>
+            <hr>
+            <h4>Potrošnja goriva:</h4>
+            <h3>{{ vozilo.potrosnja_goriva }}</h3>
+            <hr>
+        </div>
+    </div>
+    {% if vozilo.opis %}
+    <div class="col-xs-12">
+        <h4>Opis:</h4>
+            <h5>{{ vozilo.opis }}</h5>
+    </div>
+    {% endif %}
+    <div class="col-xs-12">
+        <h4>Rashodi:</h4>
+         <table class="table">
+             <thead>
+             <tr>
+                 <th>Količina</th>
+                 <th>Vrsta</th>
+                 <th>Posao</th>
+             </tr>
+             </thead>
+             <tbody>
+             {% for rashod in vozilo.rashodi_set.all %}
+             <tr>
+                 <td>{{ rashod.kolicina }}</td>
+                 <td>{{ rashod.vrsta }}</td>
+                 <td>{{ rashod.posao }}</td>
+             </tr>
+             {% endfor %}
+             </tbody>
+         </table>
+    </div>
+</div>
+{% endblock %}

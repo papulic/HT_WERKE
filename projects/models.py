@@ -85,8 +85,7 @@ class Dan(models.Model):
         verbose_name_plural = "Dani"
 
 class Prihodi(models.Model):
-    vrsta = models.CharField(max_length=50)
-    opis = models.CharField(max_length=150, blank=True)
+    vrsta = models.CharField(max_length=150)
     kolicina = models.FloatField(max_length=10, default=0.0)
     posao = models.ForeignKey(Poslovi, on_delete=models.CASCADE)
 
@@ -97,8 +96,7 @@ class Prihodi(models.Model):
         verbose_name_plural = "Prihodi"
 
 class Rashodi(models.Model):
-    vrsta = models.CharField(max_length=50)
-    opis = models.CharField(max_length=150, blank=True)
+    vrsta = models.CharField(max_length=150)
     kolicina = models.FloatField(max_length=10, default=0.0)
     posao = models.ForeignKey(Poslovi, on_delete=models.CASCADE)
     vozilo = models.ForeignKey(Vozilo, null=True, blank=True )

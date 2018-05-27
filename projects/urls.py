@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^mesecni_izvod_radnika/(?P<mesec>[0-9]+)/(?P<godina>[0-9]+)$', views.mesecni_izvod_radnika, name='monthview-workers'),
     url(r'^posao/(?P<project_id>[0-9]+)/$', views.detail, name='posao'),
     url(r'^radnik/(?P<radnik_id>[0-9]+)/$', views.radnik_detail, name='radnik-detail'),
+    url(r'^vozilo/(?P<vozilo_id>[0-9]+)/$', views.vozilo_detail, name='vozilo-detail'),
     url(r'^azuriranje_posla/(?P<project_id>[0-9]+)/$', views.posao_update, name='posao-update'),
     url(r'^azuriranje_radnika/(?P<radnik_id>[0-9]+)/$', views.radnik_update, name='radnik-update'),
     url(r'^azuriranje_dana/(?P<dan_id>[0-9]+)/$', views.dan_update, name='dan-update'),

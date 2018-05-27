@@ -31,11 +31,11 @@ class PosloviModelAdmin(admin.ModelAdmin):
     list_filter = ["ime"]
 
 class PrihodiModelAdmin(admin.ModelAdmin):
-    list_display = ["vrsta", "opis", "kolicina", "posao"]
+    list_display = ["vrsta", "kolicina", "posao"]
     list_filter = ["vrsta", "posao"]
 
 class RashodiModelAdmin(admin.ModelAdmin):
-    list_display = ["vrsta", "opis", "kolicina", "posao"]
+    list_display = ["vrsta", "kolicina", "posao"]
     list_filter = ["vrsta", "posao"]
 
 

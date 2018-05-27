@@ -41,7 +41,7 @@
                     {% for vozilo in vozila %}
                     <tr>
                         <td>
-                            <a href="{% url 'projects:vozilo-update' vozilo.id %}">
+                            <a href="{% url 'projects:vozilo-detail' vozilo.id %}">
                                 <button type="button" class="btn btn-link">
                                     <span class="glyphicon glyphicon-road"></span>&nbsp; {{ vozilo.marka }}
                                 </button>
