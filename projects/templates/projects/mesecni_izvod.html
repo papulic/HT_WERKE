@@ -52,7 +52,7 @@
             <th>Satnica</th>
             {% for dan in Dani %}
                 {% if dan.radnik == radnik %}
-                <th>{{ dan.datum.day }}</th>
+                <th {% if dan.datum.weekday == 6 %}style="color:red"{% endif %}>{{ dan.datum.day }}</th>
                 {% endif %}
                 {% endfor %}
             <th>Ukupno</th>
@@ -87,7 +87,7 @@
                 <td>
                 {% endif %}
                     <a href="{% url 'projects:dan-update' dan.id %}">
-                        <font color="black"><strong>
+                        <font color="black" {% if dan.datum.weekday == 6 %}style="color:red"{% endif %}><strong>
                         {{ dan.radio_sati }}
                         </strong></font>
                     </a>
