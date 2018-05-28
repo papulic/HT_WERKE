@@ -56,6 +56,9 @@
                 {% endif %}
                 {% endfor %}
             <th>Ukupno</th>
+            <th>Radnih sati</th>
+            <th>Dana bolovanja</th>
+            <th>Slobodnih dana</th>
         </tr>
         </thead>
         <tbody>
@@ -97,6 +100,21 @@
                 {% endfor %}
                 {% for k, v in ukupno.items %}
                 {% if k == radnik.id %}
+                <td><strong>{{ v }}kn</strong></td>
+                {% endif %}
+                {% endfor %}
+                {% for k, v in radnih_sati.items %}
+                {% if k == radnik.id %}
+                <td><strong>{{ v }}</strong></td>
+                {% endif %}
+                {% endfor %}
+                {% for k, v in dana_bolovanja.items %}
+                {% if k == radnik.id %}
+                <td><strong>{{ v }}</strong></td>
+                {% endif %}
+                {% endfor %}
+                {% for k, v in slobodnih_dana.items %}
+                {% if k == radnik.id %}
                 <td><strong>{{ v }}</strong></td>
                 {% endif %}
                 {% endfor %}
@@ -107,7 +125,7 @@
     </table>
     <hr style="height:1px;border:none;color:#333;background-color:#333;" />
     {% endfor %}
-    <h3 style="float: right">Ukupno: {{ svi }}</h3>
+    <h3 style="float: right">Ukupno: {{ svi }} kn</h3>
 </div>
 
 
