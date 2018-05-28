@@ -106,10 +106,22 @@ def mesecni_izvod_radnika(request, mesec, godina):
         Dani = Dan.objects.filter(datum__year=godina,
               datum__month=mesec)
         ukupno = {}
+        dana_bolovanja = {}
+        radnih_sati = {}
+        slobodnih_dana = {}
         for radnik in radnici:
             ukupno[radnik.id] = 0
+            dana_bolovanja[radnik.id] = 0
+            radnih_sati[radnik.id] = 0
+            slobodnih_dana[radnik.id] = 0
         for dan in Dani:
             ukupno[dan.radnik.id] += dan.radio_sati * dan.radnik.satnica
+            radnih_sati[dan.radnik.id] += dan.radio_sati
+            if dan.bolovanje:
+                dana_bolovanja[dan.radnik.id] += 1
+            if dan.dozvoljeno_odsustvo:
+                slobodnih_dana[dan.radnik.id] += 1
+
         svi = sum(ukupno.values())
         return render(request, 'projects/mesecni_izvod.html', {
             'radnici': radnici,
@@ -117,7 +129,10 @@ def mesecni_izvod_radnika(request, mesec, godina):
             'godina': godina,
             'Dani': Dani,
             'ukupno': ukupno,
-            'svi': svi
+            'svi': svi,
+            'dana_bolovanja': dana_bolovanja,
+            'radnih_sati': radnih_sati,
+            'slobodnih_dana': slobodnih_dana
         })
 
 
