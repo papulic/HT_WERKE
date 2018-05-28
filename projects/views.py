@@ -311,7 +311,7 @@ def vozilo_update(request, vozilo_id):
         vozilo = form.save(commit=False)
         vozilo.save()
         messages.success(request, "Podaci su ažurirani!")
-        return HttpResponseRedirect(reverse('projects:vozila'))
+        return HttpResponseRedirect(reverse('projects:vozilo-detail', args=(vozilo_id)))
     context = {
         "form": form,
         'vozilo_id': vozilo_id,
