@@ -31,3 +31,5 @@ pregledati titlove
 
 da li treba finansije mesecni pregled kad vec sve ima za svaki posao (ako treba za svaki dan koji nije automatski
 napravljen rashod, vozilo sipanje goriva)
+
+radnik istorija???
