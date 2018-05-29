@@ -31,5 +31,17 @@ pregledati titlove
 
 da li treba finansije mesecni pregled kad vec sve ima za svaki posao (ako treba za svaki dan koji nije automatski
 napravljen rashod, vozilo sipanje goriva)
+----------------------------------------------------
+-filter radnika na mesecnom izvodu po zanimanju i poslu.
+-pregled ukupnog rada od pocetka radnog odnosa za svaki mesec koliko danaa radnih, bolovanja, odmora i nedozvoljenog odstustva,
+ kad se udje u detalje radnika na dnu stranice
+-dan polje ishrana - automatski rashod na trenutnom projektu.
+-ako su dogovoreni radni sati 0kn rashod da ide u minus. 
+-ne unositi svaki dan na kom je poslu radnik, nego racunati rashod na trenutnom poslu!!!
+-posao dodati polje pocetak posla, kraja. Racunati broj dana..  ukupan broj radnih sati na projektu svih radnika.
+-potrebni komentari za posao ili polje u bazi ili word dokument u file field.
+- mesecni pregled radnika akontacija + ishrana, neto ld. 
 
-radnik istorija???
+- finansije -> sve poslove koji su trenutno imaju radnike (izabrati mesec kao kod radnika) svaki prihod i rashod mora imati polje datum. i na automatsku satnicu dodati datum
+- na listi vozila izbaciti kilometre i potrosnju
+-Izbaciti da mora upisati opis posla
