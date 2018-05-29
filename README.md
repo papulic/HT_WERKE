@@ -32,7 +32,7 @@ pregledati titlove
 da li treba finansije mesecni pregled kad vec sve ima za svaki posao (ako treba za svaki dan koji nije automatski
 napravljen rashod, vozilo sipanje goriva)
 ----------------------------------------------------
-- filter radnika na mesecnom izvodu po zanimanju i poslu.
+- filter radnika na mesecnom izvodu po zanimanju i poslu.  --  ok  (testirati odakle krece autoincrement)
 - pregled ukupnog rada od pocetka radnog odnosa za svaki mesec koliko danaa radnih, bolovanja, odmora i nedozvoljenog odstustva,
  kad se udje u detalje radnika na dnu stranice
 - dan polje ishrana - automatski rashod na trenutnom projektu.
@@ -43,6 +43,7 @@ napravljen rashod, vozilo sipanje goriva)
 - mesecni pregled radnika akontacija + ishrana, neto ld. 
 
 - finansije -> sve poslove koji su trenutno imaju radnike (izabrati mesec kao kod radnika) svaki prihod i rashod mora imati polje datum. i na automatsku satnicu dodati datum
-- na listi vozila izbaciti kilometre i potrosnju
+- na listi vozila izbaciti kilometre i potrosnju  --  ok
 - Izbaciti da mora upisati opis posla
 - mozda model akontacija: polja: radnik, mesec, godina.
+- ukupna kolicina troskova za vozilo  ( mozda i datum za prihod i rashod, automatski)
