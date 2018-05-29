@@ -67,7 +67,13 @@ def biranje_meseca(request):
                 data = form.cleaned_data
                 mesec = data['mesec']
                 godina = data['godina']
-                return HttpResponseRedirect(reverse('projects:monthview-workers', args=(mesec, godina)))
+                posao_ime = data['posao']
+                if posao_ime == None:
+                    posao_id = 0
+                else:
+                    posao = Poslovi.objects.get(ime=posao_ime)
+                    posao_id = posao.id
+                return HttpResponseRedirect(reverse('projects:monthview-workers', args=(mesec, godina, posao_id)))
     return render(request, 'projects/biranje_meseca.html', {
             'form': form
         })
@@ -98,11 +104,15 @@ def dodaj_dane(request, mesec, godina):
     return HttpResponseRedirect(reverse('projects:monthview-workers', args=(mesec, godina)))
 
 
-def mesecni_izvod_radnika(request, mesec, godina):
+def mesecni_izvod_radnika(request, mesec, godina, posao_id):
     if not request.user.is_authenticated():
         return render(request, 'projects/login.html')
     else:
-        radnici = Radnik.objects.filter(u_radnom_odnosu=True)
+        if posao_id == '0':
+            radnici = Radnik.objects.filter(u_radnom_odnosu=True)
+        else:
+            posao = Poslovi.objects.get(id=posao_id)
+            radnici = Radnik.objects.filter(u_radnom_odnosu=True, posao=posao)
         Dani = Dan.objects.filter(datum__year=godina,
               datum__month=mesec)
         ukupno = {}
@@ -373,7 +383,7 @@ def dan_update(request, dan_id):
                 if old_radio_sati != 0.0 and prihod.kolicina != dan.posao.dogovoreni_radni_sati * dan.radio_sati and old_posao != None:
                     prihod.kolicina -= old_radio_sati * dan.posao.dogovoreni_radni_sati
                 prihod.save()
-        return HttpResponseRedirect(reverse('projects:monthview-workers', args=(dan.datum.month, dan.datum.year)))
+        return HttpResponseRedirect(reverse('projects:monthview-workers', args=(dan.datum.month, dan.datum.year, dan.radnik.posao.id)))
     context = {
         "form": form,
         'dan_id': dan_id,

@@ -70,6 +70,7 @@ class RashodiForm(forms.ModelForm):
 class DatumForm(forms.Form):
     mesec = forms.IntegerField(max_value=12, min_value=1)
     godina = forms.IntegerField(label="godina")
+    posao = forms.ModelChoiceField(queryset=Poslovi.objects.all(), required=False)
 
 class DanForm(forms.ModelForm):
     class Meta:
