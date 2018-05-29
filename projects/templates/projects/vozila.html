@@ -29,8 +29,6 @@
                     <thead>
                     <tr>
                         <th>Marka vozila</th>
-                        <th>Predjeni kilometri</th>
-                        <th>Potrošnja goriva</th>
                         <th>Trenutno duži</th>
                         <th>Sledeći servis</th>
                         <th>Registracija ističe</th>
@@ -47,12 +45,6 @@
                                 </button>
                             </a>
                         </td>
-                        {% if vozilo.predjeni_kilometri %}
-                        <td>{{ vozilo.predjeni_kilometri }}</td>
-                        {% else %}
-                        <td>Nije uneto</td>
-                        {% endif %}
-                        <td>{{ vozilo.potrosnja_goriva }}</td>
                         {% if vozilo.trenutno_duzi == None %}
                         <td>Vozilo je dostupno</td>
                         {% else %}
