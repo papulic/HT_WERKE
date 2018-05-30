@@ -5,8 +5,12 @@ from django.db import models
 
 class Poslovi(models.Model):
     ime = models.CharField(max_length=30)
-    opis = models.CharField(max_length=100)
+    opis = models.CharField(max_length=100, blank=True)
     dogovoreni_radni_sati = models.FloatField(default=0.0)
+    dogovoreno_po_kvadratu = models.FloatField(default=0.0)
+    pocetak_radova = models.DateField()
+    kraj_radova = models.DateField(null=True, blank=True)
+    komentar = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
         return self.ime
@@ -74,6 +78,7 @@ class Dan(models.Model):
     radnik = models.ForeignKey(Radnik)
     posao = models.ForeignKey(Poslovi, null=True, blank=True)
     radio_sati = models.FloatField(max_length=10, default=0.0)
+    ishrana = models.FloatField(max_length=10, default=0.0)
     bolovanje = models.BooleanField(default=False)
     dozvoljeno_odsustvo = models.BooleanField(default=False)
     nedozvoljeno_odsustvo = models.BooleanField(default=False)

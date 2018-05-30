@@ -18,9 +18,16 @@ class ZanimanjeForm(forms.ModelForm):
         fields = ['zanimanje']
 
 class PosloviForm(forms.ModelForm):
+    pocetak_radova = forms.DateField(
+        widget=forms.DateInput(format='%d.%m.%Y', attrs={'class': "datum"}),
+        input_formats=('%d.%m.%Y', '%d/%m/%Y', '%d.%m.%y', '%d/%m/%y'))
+    kraj_radova = forms.DateField(
+        widget=forms.DateInput(format='%d.%m.%Y', attrs={'class': "datum"}),
+        input_formats=('%d.%m.%Y', '%d/%m/%Y', '%d.%m.%y', '%d/%m/%y'),
+        required=False)
     class Meta:
         model = Poslovi
-        fields = ['ime', 'opis', 'dogovoreni_radni_sati']
+        fields = ['ime', 'opis', 'dogovoreni_radni_sati', 'dogovoreno_po_kvadratu', 'pocetak_radova', 'kraj_radova', 'komentar']
 
 class RadnikForm(forms.ModelForm):
     poceo_raditi = forms.DateField(
@@ -29,7 +36,7 @@ class RadnikForm(forms.ModelForm):
         widget=forms.DateInput(format='%d.%m.%Y', attrs={'class': "datum"}), input_formats=('%d.%m.%Y', '%d/%m/%Y', '%d.%m.%y', '%d/%m/%y'))
     class Meta:
         model = Radnik
-        fields = ['ime', 'oib', 'poceo_raditi', 'ugovor_vazi_do', 'satnica', 'broj_telefona', 'broj_odela', 'broj_cipela', 'zaduzena_oprema', 'posao', 'zanimanja', 'u_radnom_odnosu', 'komentar']
+        fields = ['ime', 'oib', 'poceo_raditi', 'ugovor_vazi_do', 'satnica', 'broj_telefona', 'broj_odela', 'broj_cipela', 'zaduzena_oprema', 'zanimanja', 'u_radnom_odnosu', 'komentar']
         widgets = {
             'zanimanja': forms.CheckboxSelectMultiple,
             'komentar': forms.Textarea
@@ -50,7 +57,7 @@ class VoziloForm(forms.ModelForm):
 class RadnikForm__old(forms.ModelForm):
     class Meta:
         model = Radnik
-        fields = ['ime', 'oib', 'poceo_raditi', 'ugovor_vazi_do', 'satnica', 'broj_telefona', 'broj_odela', 'broj_cipela', 'zaduzena_oprema', 'posao', 'zanimanja']
+        fields = ['ime', 'oib', 'poceo_raditi', 'ugovor_vazi_do', 'satnica', 'broj_telefona', 'broj_odela', 'broj_cipela', 'zaduzena_oprema', 'zanimanja']
         widgets = {
             'poceo_raditi': DateInput(),
             'ugovor_vazi_do': DateInput(),
@@ -75,4 +82,4 @@ class DatumForm(forms.Form):
 class DanForm(forms.ModelForm):
     class Meta:
         model = Dan
-        fields = ['posao', 'radio_sati', 'bolovanje', 'dozvoljeno_odsustvo', 'nedozvoljeno_odsustvo']
+        fields = ['radio_sati', 'ishrana', 'bolovanje', 'dozvoljeno_odsustvo', 'nedozvoljeno_odsustvo']

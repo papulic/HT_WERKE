@@ -35,7 +35,7 @@
             <p>Pritiskom na dugme "Dodaj dane" kreiraju se svi dani koje radnik nema do današnjeg datuma, <strong>ZA SVAKOG RADNIKA</strong> koji je u radnom odnosu! To može malo potrajati, sačekajte povratnu poruku!</p>
         </div>
         <div class="col-sm-6">
-        <a href="{% url 'projects:dodaj_dane' mesec godina %}" style="float: right">
+        <a href="{% url 'projects:dodaj_dane' mesec godina posao_id %}" style="float: right">
             <button type="button" class="btn btn-warning">
                 <span class="glyphicon glyphicon-calendar"></span>&nbsp; Dodaj dane
             </button>
@@ -89,7 +89,7 @@
                 {% else %}
                 <td>
                 {% endif %}
-                    <a href="{% url 'projects:dan-update' dan.id %}">
+                    <a href="{% url 'projects:dan-update' dan.id posao_id %}">
                         <font color="black" {% if dan.datum.weekday == 6 %}style="color:red"{% endif %}><strong>
                         {{ dan.radio_sati }}
                         </strong></font>

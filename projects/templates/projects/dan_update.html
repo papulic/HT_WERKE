@@ -15,7 +15,11 @@
                     {% if error_message %}
                         <p><strong>{{ error_message }}</strong></p>
                     {% endif %}
-                        <p><font color="red"><strong>Ako želite da se automatski obračuna prihod i rashod za satnicu morate izabrati posao!</strong></font></p>
+                    {% if instance.radnik.posao == None %}
+                        <p><font color="red"><strong> Ovaj radnik nije ni na jednom poslu!Ako želite da se automatski obračuna prihod i rashod za satnicu radnik mora biti dodat na posao!</strong></font></p>
+                    {% else %}
+                    <p>Radnik je na poslu {{ instance.radnik.posao }}</p>
+                    {% endif %}
                     <form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         {% include 'projects/form_template.html' %}

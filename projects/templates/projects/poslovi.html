@@ -4,12 +4,9 @@
 {% block content %}
 
 <div class="container">
-    {% if messages %}
-    <ul class="messages">
-    {% for message in messages %}
-    <li style="color:red;" {% if message.tags == "success" %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-    </ul>
+    {% if message %}
+    <h5 style="color:red;">{{ message }}</h5>
+
     {% endif %}
 
      <div class="col-sm-12">
@@ -42,14 +39,22 @@
          <div class="well">
             <div class="row">
                 <h1>{{ posao.ime }}</h1>
+                <h3>Početak radova: {{ posao.pocetak_radova }}</h3>
+                <h3>Kraj radova: {% if posao.kraj_radova != None %}{{ posao.kraj_radova }}{% else %}{% endif %}</h3>
             </div>
              {% if posao.dogovoreni_radni_sati != 0.0 %}
              <h4>Dogovoren radni sat: {{ posao.dogovoreni_radni_sati}}</h4>
              {% else %}
              <h4>Ovaj posao nije dogovoren na radni sat</h4>
              {% endif %}
+             {% if posao.dogovoreno_po_kvadratu != 0.0 %}
+             <h4>Dogovoreno po kvadratu: {{ posao.dogovoreno_po_kvadratu}}</h4>
+             {% else %}
+             <h4>Ovaj posao nije dogovoren na kvadrate</h4>
+             {% endif %}
             <div class="row">
                 <h3>opis: {{ posao.opis }}</h3>
+                <h4>Svi do sada uneti radni sati za sve radnike koji su na projektu: {{ radni_sati_svih_radnika }}</h4>
             </div>
          </div>
          <h3>Finansije</h3>
@@ -150,6 +155,8 @@
                  </table>
              </div>
          </form>
+         <h4>Komentar:</h4>
+         <p>{{ posao.komentar }}</p>
      </div>
      <div class="col-sm-4 left-border">
          <h3>Dostupni radnici</h3>

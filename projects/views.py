@@ -67,11 +67,10 @@ def biranje_meseca(request):
                 data = form.cleaned_data
                 mesec = data['mesec']
                 godina = data['godina']
-                posao_ime = data['posao']
-                if posao_ime == None:
-                    posao_id = 0
+                posao = data['posao']
+                if posao == None:
+                    posao_id = 'SviPoslovi'
                 else:
-                    posao = Poslovi.objects.get(ime=posao_ime)
                     posao_id = posao.id
                 return HttpResponseRedirect(reverse('projects:monthview-workers', args=(mesec, godina, posao_id)))
     return render(request, 'projects/biranje_meseca.html', {
@@ -79,7 +78,7 @@ def biranje_meseca(request):
         })
 
 
-def dodaj_dane(request, mesec, godina):
+def dodaj_dane(request, mesec, godina, posao_id):
     dan_dodat = False
     current_date = datetime.date.today()
     radnici = Radnik.objects.filter(u_radnom_odnosu=True)
@@ -101,14 +100,14 @@ def dodaj_dane(request, mesec, godina):
         messages.success(request, "Svi dani do današnjeg datuma su dodati!")
     else:
         messages.success(request, "Svi dani do današnjeg datuma već postoje!")
-    return HttpResponseRedirect(reverse('projects:monthview-workers', args=(mesec, godina)))
+    return HttpResponseRedirect(reverse('projects:monthview-workers', args=(mesec, godina, posao_id)))
 
 
 def mesecni_izvod_radnika(request, mesec, godina, posao_id):
     if not request.user.is_authenticated():
         return render(request, 'projects/login.html')
     else:
-        if posao_id == '0':
+        if posao_id == 'SviPoslovi':
             radnici = Radnik.objects.filter(u_radnom_odnosu=True)
         else:
             posao = Poslovi.objects.get(id=posao_id)
@@ -142,7 +141,8 @@ def mesecni_izvod_radnika(request, mesec, godina, posao_id):
             'svi': svi,
             'dana_bolovanja': dana_bolovanja,
             'radnih_sati': radnih_sati,
-            'slobodnih_dana': slobodnih_dana
+            'slobodnih_dana': slobodnih_dana,
+            'posao_id': posao_id
         })
 
 
@@ -239,7 +239,17 @@ def detail(request, project_id):
     if not request.user.is_authenticated():
         return render(request, 'projects/login.html')
     else:
+        message = ""
+        current_date = datetime.date.today()
         project = get_object_or_404(Poslovi, pk=project_id)
+        Dani = Dan.objects.filter(posao=project)
+        radni_sati_svih_radnika = 0.0
+        for dan in Dani:
+            radni_sati_svih_radnika += dan.radio_sati
+        if project.kraj_radova:
+            preostalo_dana = project.kraj_radova - current_date
+        else:
+            preostalo_dana = 100
         # get only prihodi and rashodi for current project
         prihodi = Prihodi.objects.filter(posao=project)
         rashodi = Rashodi.objects.filter(posao=project)
@@ -268,6 +278,14 @@ def detail(request, project_id):
                 radnik.dostupan = True
                 radnik.posao = None
                 radnik.save()
+        if isinstance(preostalo_dana, datetime.timedelta):
+            if preostalo_dana.days < 0:
+                radnici_na_projektu = Radnik.objects.filter(posao=project)
+                for radnik in radnici_na_projektu:
+                    radnik.dostupan = True
+                    radnik.posao = None
+                    radnik.save()
+                message = "Ne možete više dodati radnike na ovaj posao!"
         return render(request, 'projects/poslovi.html', {
             'posao': project,
             'project_id': project_id,
@@ -278,6 +296,8 @@ def detail(request, project_id):
             'ukupni_rashodi': ukupni_rashodi,
             'ukupni_prihodi': ukupni_prihodi,
             'dobit': dobit,
+            'message': message,
+            'radni_sati_svih_radnika': radni_sati_svih_radnika
         })
 
 
@@ -289,6 +309,52 @@ def radnik_detail(request, radnik_id):
         current_date = datetime.date.today()
         preostalo_dana = radnik.ugovor_vazi_do - current_date
         radnik.dana_do_isteka_ugovora = preostalo_dana.days
+        svi_dani_radnika = Dan.objects.filter(radnik=radnik)
+        # godine = {}
+        # for dan in svi_dani_radnika:
+        #     if dan.datum.year not in godine:
+        #         godine[dan.datum.year] = {}
+        #     if dan.datum.month not in godine[dan.datum.year]:
+        #         godine[dan.datum.year][dan.datum.month] = []
+        #     godine[dan.datum.year][dan.datum.month].append(dan)
+        godine = []
+        for dan in svi_dani_radnika:
+            godina_postoji = False
+            mesec_postoji = False
+            for godina in godine:
+                if godina[0] == dan.datum.year:
+                    godina_postoji = True
+                    break
+            if not godina_postoji:
+                godine.append([dan.datum.year, []])
+            for godina in godine:
+                if godina[0] == dan.datum.year:
+                    meseci = godina[1]
+            for mesec in meseci:
+                if mesec[0] == dan.datum.month:
+                    mesec_postoji = True
+                    break
+            if not mesec_postoji:
+                meseci.append([dan.datum.month, {'radnih_dana': 0,
+                                                 'bolovanja': 0,
+                                                 'odmora': 0,
+                                                 'nedozvoljenog_odsustva': 0,
+                                                 'radnih_sati': 0.0}])
+            for mesec in meseci:
+                if mesec[0] == dan.datum.month:
+                    dani = mesec[1]
+            if dan.bolovanje:
+                dani['bolovanja'] += 1
+            elif dan.dozvoljeno_odsustvo:
+                dani['odmora'] += 1
+            elif dan.nedozvoljeno_odsustvo:
+                dani['nedozvoljenog_odsustva'] += 1
+            else:
+                dani['radnih_dana'] += 1
+                dani['radnih_sati'] += dan.radio_sati
+
+
+
         if radnik.posao != None:
             radnik.dostupan = False
         else:
@@ -297,6 +363,7 @@ def radnik_detail(request, radnik_id):
         return render(request, 'projects/radnik_detalji.html', {
             'radnik': radnik,
             'radnik_id': radnik_id,
+            'godine': godine
         })
 
 
@@ -344,16 +411,23 @@ def vozilo_update(request, vozilo_id):
     return render(request, 'projects/vozilo_update.html', context)
 
 
-def dan_update(request, dan_id):
+def dan_update(request, dan_id, posao_id):
+    current_date = datetime.date.today()
     instance = Dan.objects.get(pk=dan_id)
     old_radio_sati = instance.radio_sati
-    old_posao = instance.posao
+    old_ishrana = instance.ishrana
     form = DanForm(request.POST or None, instance=instance)
     if form.is_valid():
         dan = form.save(commit=False)
+        dan.posao = dan.radnik.posao
         dan.save()
         if dan.posao:
-            if dan.posao.dogovoreni_radni_sati != 0.0:
+            if dan.posao.kraj_radova:
+                preostalo_dana = dan.posao.kraj_radova - current_date
+                preostalo_dana = preostalo_dana.days
+            else:
+                preostalo_dana = 100
+            if preostalo_dana > 0:
                 try:
                     rashod = Rashodi.objects.get(vrsta="AUTOMATSKA_SATNICA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id))
                 except:
@@ -365,25 +439,40 @@ def dan_update(request, dan_id):
                     rashod.posao = dan.posao
                     rashod.kolicina = dan.radio_sati * dan.radnik.satnica
                     rashod.vrsta = "AUTOMATSKA_SATNICA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id)
-                if old_radio_sati != 0.0 and rashod.kolicina != dan.radio_sati * dan.radnik.satnica and old_posao != None:
+                if old_radio_sati != 0.0 and rashod.kolicina != dan.radio_sati * dan.radnik.satnica:
                     rashod.kolicina -= old_radio_sati * dan.radnik.satnica
                 rashod.save()
-                ###############################################################
                 try:
-                    prihod = Prihodi.objects.get(vrsta="AUTOMATSKA_SATNICA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id))
+                    rashod_ishrana = Rashodi.objects.get(vrsta="AUTOMATSKA_ISHRANA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id))
                 except:
                     pass
                 try:
-                    prihod.kolicina += dan.posao.dogovoreni_radni_sati * dan.radio_sati
+                    rashod_ishrana.kolicina += dan.ishrana
                 except:
-                    prihod = Prihodi()
-                    prihod.posao = dan.posao
-                    prihod.kolicina = dan.posao.dogovoreni_radni_sati * dan.radio_sati
-                    prihod.vrsta = "AUTOMATSKA_SATNICA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id)
-                if old_radio_sati != 0.0 and prihod.kolicina != dan.posao.dogovoreni_radni_sati * dan.radio_sati and old_posao != None:
-                    prihod.kolicina -= old_radio_sati * dan.posao.dogovoreni_radni_sati
-                prihod.save()
-        return HttpResponseRedirect(reverse('projects:monthview-workers', args=(dan.datum.month, dan.datum.year, dan.radnik.posao.id)))
+                    rashod_ishrana = Rashodi()
+                    rashod_ishrana.posao = dan.posao
+                    rashod_ishrana.kolicina = dan.ishrana
+                    rashod_ishrana.vrsta = "AUTOMATSKA_ISHRANA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id)
+                if old_ishrana != 0.0:
+                    rashod_ishrana.kolicina -= old_ishrana
+                rashod_ishrana.save()
+                ###############################################################
+                if dan.posao.dogovoreni_radni_sati != 0.0:
+                    try:
+                        prihod = Prihodi.objects.get(vrsta="AUTOMATSKA_SATNICA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id))
+                    except:
+                        pass
+                    try:
+                        prihod.kolicina += dan.posao.dogovoreni_radni_sati * dan.radio_sati
+                    except:
+                        prihod = Prihodi()
+                        prihod.posao = dan.posao
+                        prihod.kolicina = dan.posao.dogovoreni_radni_sati * dan.radio_sati
+                        prihod.vrsta = "AUTOMATSKA_SATNICA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id)
+                    if old_radio_sati != 0.0 and prihod.kolicina != dan.posao.dogovoreni_radni_sati * dan.radio_sati:
+                        prihod.kolicina -= old_radio_sati * dan.posao.dogovoreni_radni_sati
+                    prihod.save()
+        return HttpResponseRedirect(reverse('projects:monthview-workers', args=(dan.datum.month, dan.datum.year, posao_id)))
     context = {
         "form": form,
         'dan_id': dan_id,

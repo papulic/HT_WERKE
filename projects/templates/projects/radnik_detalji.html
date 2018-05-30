@@ -88,5 +88,56 @@
         <h4>Komentar:</h4>
             <h5>{{ radnik.komentar }}</h5>
     </div>
+    <hr><hr>
+    <div class="col-xs-12">
+        <h3>Pregled ukupnog rada od početka radnog odnosa:</h3><br>
+            {% for godina in godine %}
+        <h4><strong> godina {{ godina.0 }}</strong></h4>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Mesec</th>
+                        <th><font color="black" style="background-color:#3fff3f">Radnih dana</font></th>
+                        <th><font color="black" style="background-color:#07d3f7">Bolovanja</font></th>
+                        <th><font color="black" style="background-color:#eef707">Odmora</font></th>
+                        <th><font color="black" style="background-color:#ed6a6a">Nedozvoljenog odsustva</font></th>
+                        <th><font color="black">Radnih sati</font></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for mesec in godina.1 %}
+                    <tr>
+                        <td><strong>{{ mesec.0 }}</strong></td>
+                        {% for k, v in mesec.1.items %}
+                        {% if k == 'radnih_dana' %}
+                        <td>{{ v }}</td>
+                        {% endif %}
+                        {% endfor %}
+                        {% for k, v in mesec.1.items %}
+                        {% if k == 'bolovanja' %}
+                        <td>{{ v }}</td>
+                        {% endif %}
+                        {% endfor %}
+                        {% for k, v in mesec.1.items %}
+                        {% if k == 'odmora' %}
+                        <td>{{ v }}</td>
+                        {% endif %}
+                        {% endfor %}
+                        {% for k, v in mesec.1.items %}
+                        {% if k == 'nedozvoljenog_odsustva' %}
+                        <td>{{ v }}</td>
+                        {% endif %}
+                        {% endfor %}
+                        {% for k, v in mesec.1.items %}
+                        {% if k == 'radnih_sati' %}
+                        <td>{{ v }}</td>
+                        {% endif %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endfor %}
+    </div>
 </div>
 {% endblock %}
