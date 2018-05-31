@@ -50,12 +50,14 @@
             <th>Ime</th>
             <th>Trenutno na poslu</th>
             <th>Satnica</th>
+            <th>Akontacija</th>
+            <th class="right-border">Ishrana</th>
             {% for dan in Dani %}
                 {% if dan.radnik == radnik %}
                 <th {% if dan.datum.weekday == 6 %}style="color:red"{% endif %}>{{ dan.datum.day }}</th>
                 {% endif %}
                 {% endfor %}
-            <th>Ukupno</th>
+            <th class="left-border">Neto LD</th>
             <th>Radnih sati</th>
             <th>Dana bolovanja</th>
             <th>Slobodnih dana</th>
@@ -74,6 +76,21 @@
                 ---------
                 {% endif %}</td>
                 <td>{{ radnik.satnica }} kn</td>
+                <td>{% for a in akontacije %}
+                    {% if a.radnik == radnik %}
+                    <a href="{% url 'projects:akontacija-update' mesec godina posao_id a.id %}">
+                        <font color="black" {% if dan.datum.weekday == 6 %}style="color:red"{% endif %}><strong>
+                        {{ a.kolicina }}
+                        </strong></font>
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+                </td>
+                {% for k, v in ishrana.items %}
+                {% if k == radnik.id %}
+                <td class="right-border">{{ v }}</td>
+                {% endif %}
+                {% endfor %}
 
                 {% for dan in Dani %}
                 {% if dan.radnik == radnik %}
@@ -100,7 +117,7 @@
                 {% endfor %}
                 {% for k, v in ukupno.items %}
                 {% if k == radnik.id %}
-                <td><strong>{{ v }}kn</strong></td>
+                <td class="left-border"><strong>{{ v }}kn</strong></td>
                 {% endif %}
                 {% endfor %}
                 {% for k, v in radnih_sati.items %}
@@ -125,7 +142,8 @@
     </table>
     <hr style="height:1px;border:none;color:#333;background-color:#333;" />
     {% endfor %}
-    <h3 style="float: right">Ukupno: {{ svi }} kn</h3>
+    <h4>Ukupno isplaćene akontacije: {{ sve_akontacije }}</h4>
+    <h3 style="float: right">Ukupno za isplatu: {{ svi }} kn</h3>
 </div>
 
 

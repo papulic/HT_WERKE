@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from .models import Radnik, Vozilo, Poslovi, Prihodi, Rashodi, Zanimanja, Dan
+from .models import Radnik, Vozilo, Poslovi, Prihodi, Rashodi, Zanimanja, Dan, Akontacije
 
 
 #class RadniciInline(admin.TabularInline):
@@ -38,6 +38,11 @@ class RashodiModelAdmin(admin.ModelAdmin):
     list_display = ["vrsta", "kolicina", "posao"]
     list_filter = ["vrsta", "posao"]
 
+class AkontacijeModelAdmin(admin.ModelAdmin):
+    list_display = ["godina", "mesec", "kolicina"]
+    list_filter = ["godina", "mesec"]
+
+
 
 
 admin.site.register(Radnik, RadnikModelAdmin)
@@ -47,4 +52,4 @@ admin.site.register(Prihodi, PrihodiModelAdmin)
 admin.site.register(Rashodi, RashodiModelAdmin)
 admin.site.register(Zanimanja, ZanimanjaModelAdmin)
 admin.site.register(Dan, DanModelAdmin)
-
+admin.site.register(Akontacije, AkontacijeModelAdmin)

@@ -75,7 +75,7 @@ class Vozilo(models.Model):
 
 class Dan(models.Model):
     datum = models.DateField()
-    radnik = models.ForeignKey(Radnik)
+    radnik = models.ForeignKey(Radnik, on_delete=models.CASCADE)
     posao = models.ForeignKey(Poslovi, null=True, blank=True)
     radio_sati = models.FloatField(max_length=10, default=0.0)
     ishrana = models.FloatField(max_length=10, default=0.0)
@@ -112,3 +112,14 @@ class Rashodi(models.Model):
     class Meta:
         verbose_name_plural = "Rashodi"
 
+class Akontacije(models.Model):
+    godina = models.IntegerField()
+    mesec = models.IntegerField()
+    kolicina = models.FloatField(default=0.0)
+    radnik = models.ForeignKey(Radnik)
+
+    def __unicode__(self):
+        return self.radnik.ime
+
+    class Meta:
+        verbose_name_plural = "Akontacije"

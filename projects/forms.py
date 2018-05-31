@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Poslovi, Vozilo, Radnik, Prihodi, Rashodi, Dan, Zanimanja
+from .models import Poslovi, Vozilo, Radnik, Prihodi, Rashodi, Dan, Zanimanja, Akontacije
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -83,3 +83,8 @@ class DanForm(forms.ModelForm):
     class Meta:
         model = Dan
         fields = ['radio_sati', 'ishrana', 'bolovanje', 'dozvoljeno_odsustvo', 'nedozvoljeno_odsustvo']
+
+class AkontacijeForm(forms.ModelForm):
+    class Meta:
+        model = Akontacije
+        fields = ['kolicina']

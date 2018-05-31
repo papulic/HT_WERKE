@@ -4,11 +4,11 @@ from __future__ import unicode_literals
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
-from .forms import UserForm, PosloviForm, RadnikForm, PrihodiForm, RashodiForm, DatumForm, DanForm, ZanimanjeForm, VoziloForm
+from .forms import UserForm, PosloviForm, RadnikForm, PrihodiForm, RashodiForm, DatumForm, DanForm, ZanimanjeForm, VoziloForm, AkontacijeForm
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
-from .models import Poslovi, Vozilo, Radnik, Prihodi, Rashodi, Zanimanja, Dan
+from .models import Poslovi, Vozilo, Radnik, Prihodi, Rashodi, Zanimanja, Dan, Akontacije
 from .filters import RadnikFilter, ZanimanjeFilter
 import datetime
 import calendar
@@ -80,6 +80,7 @@ def biranje_meseca(request):
 
 def dodaj_dane(request, mesec, godina, posao_id):
     dan_dodat = False
+    akontacije_dodate = False
     current_date = datetime.date.today()
     radnici = Radnik.objects.filter(u_radnom_odnosu=True)
     for radnik in radnici:
@@ -96,6 +97,14 @@ def dodaj_dane(request, mesec, godina, posao_id):
                 new_day.radnik = radnik
                 new_day.save()
                 dan_dodat = True
+                try:
+                    akontacija = Akontacije.objects.get(mesec=day.month, godina=day.year, radnik=radnik)
+                except:
+                    akontacija = Akontacije()
+                    akontacija.radnik = radnik
+                    akontacija.mesec = day.month
+                    akontacija.godina = day.year
+                    akontacija.save()
     if dan_dodat:
         messages.success(request, "Svi dani do današnjeg datuma su dodati!")
     else:
@@ -114,22 +123,30 @@ def mesecni_izvod_radnika(request, mesec, godina, posao_id):
             radnici = Radnik.objects.filter(u_radnom_odnosu=True, posao=posao)
         Dani = Dan.objects.filter(datum__year=godina,
               datum__month=mesec)
+        Akontacije_za_mesec = Akontacije.objects.filter(mesec=mesec, godina=godina)
         ukupno = {}
         dana_bolovanja = {}
         radnih_sati = {}
         slobodnih_dana = {}
+        ishrana = {}
+        sve_akontacije = 0
         for radnik in radnici:
             ukupno[radnik.id] = 0
             dana_bolovanja[radnik.id] = 0
             radnih_sati[radnik.id] = 0
             slobodnih_dana[radnik.id] = 0
+            ishrana[radnik.id] = 0
         for dan in Dani:
-            ukupno[dan.radnik.id] += dan.radio_sati * dan.radnik.satnica
+            ukupno[dan.radnik.id] += (dan.radio_sati * dan.radnik.satnica) + dan.ishrana
             radnih_sati[dan.radnik.id] += dan.radio_sati
+            ishrana[dan.radnik.id] += dan.ishrana
             if dan.bolovanje:
                 dana_bolovanja[dan.radnik.id] += 1
             if dan.dozvoljeno_odsustvo:
                 slobodnih_dana[dan.radnik.id] += 1
+        for a in Akontacije_za_mesec:
+            ukupno[a.radnik.id] -= a.kolicina
+            sve_akontacije += a.kolicina
 
         svi = sum(ukupno.values())
         return render(request, 'projects/mesecni_izvod.html', {
@@ -142,7 +159,10 @@ def mesecni_izvod_radnika(request, mesec, godina, posao_id):
             'dana_bolovanja': dana_bolovanja,
             'radnih_sati': radnih_sati,
             'slobodnih_dana': slobodnih_dana,
-            'posao_id': posao_id
+            'posao_id': posao_id,
+            'akontacije': Akontacije_za_mesec,
+            'ishrana': ishrana,
+            'sve_akontacije': sve_akontacije
         })
 
 
@@ -374,10 +394,14 @@ def vozilo_detail(request, vozilo_id):
         vozilo = get_object_or_404(Vozilo, pk=vozilo_id)
         current_date = datetime.date.today()
         preostalo_dana = (vozilo.registracija_istice - current_date).days
+        ukupni_troskovi = 0
+        for rashod in vozilo.rashodi_set.all():
+            ukupni_troskovi += rashod.kolicina
         return render(request, 'projects/vozilo_detalji.html', {
             'vozilo': vozilo,
             'vozilo_id': vozilo_id,
-            'preostalo_dana': preostalo_dana
+            'preostalo_dana': preostalo_dana,
+            'ukupni_troskovi': ukupni_troskovi
         })
 
 
@@ -479,6 +503,21 @@ def dan_update(request, dan_id, posao_id):
         'instance': instance
     }
     return render(request, 'projects/dan_update.html', context)
+
+
+def akontacija_update(request, mesec, godina, posao_id, akontacija_id):
+    instance = Akontacije.objects.get(pk=akontacija_id)
+    form = AkontacijeForm(request.POST or None, instance=instance)
+    if form.is_valid():
+        akontacija = form.save(commit=False)
+        akontacija.save()
+        return HttpResponseRedirect(reverse('projects:monthview-workers', args=(mesec, godina, posao_id)))
+    context = {
+        "form": form,
+        'instance': instance,
+    }
+    return render(request, 'projects/akontacija_update.html', context)
+
 
 
 def radnik_update(request, radnik_id):
