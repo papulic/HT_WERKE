@@ -65,19 +65,29 @@ class RadnikForm__old(forms.ModelForm):
         }
 
 class PrihodiForm(forms.ModelForm):
+    datum = forms.DateField(
+        widget=forms.DateInput(format='%d.%m.%Y', attrs={'class': "datum"}),
+        input_formats=('%d.%m.%Y', '%d/%m/%Y', '%d.%m.%y', '%d/%m/%y'))
     class Meta:
         model = Prihodi
-        fields = ['vrsta', 'kolicina']
+        fields = ['datum', 'vrsta', 'kolicina']
 
 class RashodiForm(forms.ModelForm):
+    datum = forms.DateField(
+        widget=forms.DateInput(format='%d.%m.%Y', attrs={'class': "datum"}),
+        input_formats=('%d.%m.%Y', '%d/%m/%Y', '%d.%m.%y', '%d/%m/%y'))
     class Meta:
         model = Rashodi
-        fields = ['vrsta', 'kolicina', 'vozilo']
+        fields = ['datum', 'vrsta', 'kolicina', 'vozilo']
 
 class DatumForm(forms.Form):
     mesec = forms.IntegerField(max_value=12, min_value=1)
     godina = forms.IntegerField(label="godina")
     posao = forms.ModelChoiceField(queryset=Poslovi.objects.all(), required=False)
+
+class Datum_finansForm(forms.Form):
+    mesec = forms.IntegerField(max_value=12, min_value=1)
+    godina = forms.IntegerField(label="godina")
 
 class DanForm(forms.ModelForm):
     class Meta:

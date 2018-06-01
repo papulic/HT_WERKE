@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
-from .forms import UserForm, PosloviForm, RadnikForm, PrihodiForm, RashodiForm, DatumForm, DanForm, ZanimanjeForm, VoziloForm, AkontacijeForm
+from .forms import UserForm, PosloviForm, RadnikForm, PrihodiForm, RashodiForm, DatumForm, DanForm, ZanimanjeForm, VoziloForm, AkontacijeForm, Datum_finansForm
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
@@ -78,9 +78,24 @@ def biranje_meseca(request):
         })
 
 
+def biranje_meseca_za_finansije(request):
+    if not request.user.is_authenticated():
+        return render(request, 'projects/login.html')
+    else:
+        form = Datum_finansForm(request.POST or None)
+        if request.method == 'POST':
+            if form.is_valid():
+                data = form.cleaned_data
+                mesec = data['mesec']
+                godina = data['godina']
+                return HttpResponseRedirect(reverse('projects:monthview-projects', args=(mesec, godina)))
+    return render(request, 'projects/biranje_meseca.html', {
+            'form': form
+        })
+
+
 def dodaj_dane(request, mesec, godina, posao_id):
     dan_dodat = False
-    akontacije_dodate = False
     current_date = datetime.date.today()
     radnici = Radnik.objects.filter(u_radnom_odnosu=True)
     for radnik in radnici:
@@ -163,6 +178,29 @@ def mesecni_izvod_radnika(request, mesec, godina, posao_id):
             'akontacije': Akontacije_za_mesec,
             'ishrana': ishrana,
             'sve_akontacije': sve_akontacije
+        })
+
+
+def mesecni_izvod_poslova(request, mesec, godina):
+    if not request.user.is_authenticated():
+        return render(request, 'projects/login.html')
+    else:
+        svi_poslovi = Poslovi.objects.all()
+        poslovi = []
+        for posao in svi_poslovi:
+            if len(posao.radnik_set.all()) > 0:
+                poslovi.append(posao)
+        prihodi = Prihodi.objects.filter(datum__year=godina,
+                                  datum__month=mesec)
+        rashodi = Rashodi.objects.filter(datum__year=godina,
+                                  datum__month=mesec)
+
+        return render(request, 'projects/mesecni_izvod_finansije.html', {
+            'poslovi': poslovi,
+            'prihodi': prihodi,
+            'rashodi': rashodi,
+            'mesec': mesec,
+            'godina': godina,
         })
 
 
@@ -453,7 +491,7 @@ def dan_update(request, dan_id, posao_id):
                 preostalo_dana = 100
             if preostalo_dana > 0:
                 try:
-                    rashod = Rashodi.objects.get(vrsta="AUTOMATSKA_SATNICA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id))
+                    rashod = Rashodi.objects.get(vrsta="SATNICA_RADNIKA_{id}_{p}_{m}_{g}".format(p=dan.posao.ime, id=dan.posao.id, m=dan.datum.month, g=dan.datum.year))
                 except:
                     pass
                 try:
@@ -462,12 +500,13 @@ def dan_update(request, dan_id, posao_id):
                     rashod = Rashodi()
                     rashod.posao = dan.posao
                     rashod.kolicina = dan.radio_sati * dan.radnik.satnica
-                    rashod.vrsta = "AUTOMATSKA_SATNICA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id)
+                    rashod.datum = dan.datum
+                    rashod.vrsta = "SATNICA_RADNIKA_{id}_{p}_{m}_{g}".format(p=dan.posao.ime, id=dan.posao.id, m=dan.datum.month, g=dan.datum.year)
                 if old_radio_sati != 0.0 and rashod.kolicina != dan.radio_sati * dan.radnik.satnica:
                     rashod.kolicina -= old_radio_sati * dan.radnik.satnica
                 rashod.save()
                 try:
-                    rashod_ishrana = Rashodi.objects.get(vrsta="AUTOMATSKA_ISHRANA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id))
+                    rashod_ishrana = Rashodi.objects.get(vrsta="ISHRANA_RADNIKA_{id}_{p}_{m}_{g}".format(p=dan.posao.ime, id=dan.posao.id, m=dan.datum.month, g=dan.datum.year))
                 except:
                     pass
                 try:
@@ -475,15 +514,16 @@ def dan_update(request, dan_id, posao_id):
                 except:
                     rashod_ishrana = Rashodi()
                     rashod_ishrana.posao = dan.posao
+                    rashod_ishrana.datum = dan.datum
                     rashod_ishrana.kolicina = dan.ishrana
-                    rashod_ishrana.vrsta = "AUTOMATSKA_ISHRANA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id)
+                    rashod_ishrana.vrsta = "ISHRANA_RADNIKA_{id}_{p}_{m}_{g}".format(p=dan.posao.ime, id=dan.posao.id, m=dan.datum.month, g=dan.datum.year)
                 if old_ishrana != 0.0:
                     rashod_ishrana.kolicina -= old_ishrana
                 rashod_ishrana.save()
                 ###############################################################
                 if dan.posao.dogovoreni_radni_sati != 0.0:
                     try:
-                        prihod = Prihodi.objects.get(vrsta="AUTOMATSKA_SATNICA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id))
+                        prihod = Prihodi.objects.get(vrsta="SATNICA_RADNIKA_{id}_{p}_{m}_{g}".format(p=dan.posao.ime, id=dan.posao.id, m=dan.datum.month, g=dan.datum.year))
                     except:
                         pass
                     try:
@@ -491,8 +531,9 @@ def dan_update(request, dan_id, posao_id):
                     except:
                         prihod = Prihodi()
                         prihod.posao = dan.posao
+                        prihod.datum = dan.datum
                         prihod.kolicina = dan.posao.dogovoreni_radni_sati * dan.radio_sati
-                        prihod.vrsta = "AUTOMATSKA_SATNICA_RADNIKA_ZA_PROJEKAT_{p}_{id}".format(p=dan.posao.ime, id=dan.posao.id)
+                        prihod.vrsta = "SATNICA_RADNIKA_{id}_{p}_{m}_{g}".format(p=dan.posao.ime, id=dan.posao.id, m=dan.datum.month, g=dan.datum.year)
                     if old_radio_sati != 0.0 and prihod.kolicina != dan.posao.dogovoreni_radni_sati * dan.radio_sati:
                         prihod.kolicina -= old_radio_sati * dan.posao.dogovoreni_radni_sati
                     prihod.save()

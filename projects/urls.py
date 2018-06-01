@@ -11,7 +11,8 @@ urlpatterns = [
     url(r'^login_user/$', views.login_user, name='login_user'),
     url(r'^logout_user/$', views.logout_user, name='logout_user'),
     url(r'^novi_projekat/$', views.create_project, name='project-add'),
-    url(r'^mesecni_izvod_radnika/(?P<mesec>[0-9]+)/(?P<godina>[0-9]+)/(?P<posao_id>[a-zA-Z0-9_.-]+)$', views.mesecni_izvod_radnika, name='monthview-workers'), # samo string (?P<posao>[\w\-]+)
+    url(r'^mesecni_pregled_radnika/(?P<mesec>[0-9]+)/(?P<godina>[0-9]+)/(?P<posao_id>[a-zA-Z0-9_.-]+)$', views.mesecni_izvod_radnika, name='monthview-workers'),  # samo string (?P<posao>[\w\-]+)
+    url(r'^mesecni_pregled_poslova/(?P<mesec>[0-9]+)/(?P<godina>[0-9]+)$', views.mesecni_izvod_poslova, name='monthview-projects'),
     url(r'^posao/(?P<project_id>[0-9]+)/$', views.detail, name='posao'),
     url(r'^radnik/(?P<radnik_id>[0-9]+)/$', views.radnik_detail, name='radnik-detail'),
     url(r'^vozilo/(?P<vozilo_id>[0-9]+)/$', views.vozilo_detail, name='vozilo-detail'),
@@ -28,5 +29,6 @@ urlpatterns = [
     url(r'^posao/(?P<project_id>[0-9]+)/obrisi_prihod/(?P<prihod_id>[0-9]+)/$', views.prihod_delete, name='prihod-delete'),
     url(r'^(?P<project_id>[0-9]+)/obrisi_rashod/(?P<rashod_id>[0-9]+)/$', views.rashod_delete, name='rashod-delete'),
     url(r'^biranje_meseca/$', views.biranje_meseca, name='biranje_meseca'),
+    url(r'^biranje_meseca_finansije/$', views.biranje_meseca_za_finansije, name='biranje_meseca_finansije'),
     url(r'^dodaj_dane/(?P<mesec>[0-9]+)/(?P<godina>[0-9]+)/(?P<posao_id>[a-zA-Z0-9_.-]+)$', views.dodaj_dane, name='dodaj_dane')
 ]

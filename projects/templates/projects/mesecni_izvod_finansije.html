@@ -1,0 +1,50 @@
+{% extends 'projects/base.html' %}
+{% block title %} - Finansije {% endblock %}
+{% block content %}
+{% load staticfiles %}
+
+<div class="container">
+    <h3>Finansije za {{ mesec }}.{{ godina }}</h3>
+    {% if messages %}
+    <ul class="messages">
+    {% for message in messages %}
+    <li style="color:red;" {% if message.tags == "success" %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+    <div class='container'>
+        <div class="col-sm-6">
+            <a href="{% url 'projects:biranje_meseca_finansije' %}" style="float: right">
+                <button type="button" class="btn btn-warning">
+                    <span class="glyphicon glyphicon-calendar"></span>&nbsp; Izaberi drugi mesec
+                </button>
+            </a>
+        </div>
+        <div class="table-div">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Posao</th>
+                    <th>Prihodi</th>
+                    <th>Rashodi</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for posao in poslovi %}
+                <tr>
+                    <td><a href="{% url 'projects:posao' posao.id %}">
+                            <button type="button" class="btn btn-link">
+                                <span class="glyphicon glyphicon-wrench"></span>&nbsp; {{ posao.ime }}
+                            </button>
+                        </a>
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
