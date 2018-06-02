@@ -186,21 +186,39 @@ def mesecni_izvod_poslova(request, mesec, godina):
         return render(request, 'projects/login.html')
     else:
         svi_poslovi = Poslovi.objects.all()
+        prihodi = Prihodi.objects.filter(datum__year=godina,
+                                         datum__month=mesec)
+        rashodi = Rashodi.objects.filter(datum__year=godina,
+                                         datum__month=mesec)
         poslovi = []
+        mesecni_prihodi = {}
+        mesecni_rashodi = {}
+        mesecno_dobit = {}
         for posao in svi_poslovi:
             if len(posao.radnik_set.all()) > 0:
                 poslovi.append(posao)
-        prihodi = Prihodi.objects.filter(datum__year=godina,
-                                  datum__month=mesec)
-        rashodi = Rashodi.objects.filter(datum__year=godina,
-                                  datum__month=mesec)
-
+                mesecni_prihodi[posao.id] = 0
+                mesecni_rashodi[posao.id] = 0
+                for prihod in posao.prihodi_set.all():
+                    if prihod in prihodi:
+                        mesecni_prihodi[posao.id] += prihod.kolicina
+                for rashod in posao.rashodi_set.all():
+                    if rashod in rashodi:
+                        mesecni_rashodi[posao.id] += rashod.kolicina
+                mesecno_dobit[posao.id] = mesecni_prihodi[posao.id] - mesecni_rashodi[posao.id]
+        ukupna_dobit = sum(mesecno_dobit.values())
+        ukupni_prihodi = sum(mesecni_prihodi.values())
+        ukupni_rashodi = sum(mesecni_rashodi.values())
         return render(request, 'projects/mesecni_izvod_finansije.html', {
             'poslovi': poslovi,
-            'prihodi': prihodi,
-            'rashodi': rashodi,
+            'mesecni_prihodi': mesecni_prihodi,
+            'mesecni_rashodi': mesecni_rashodi,
+            'mesecno_dobit': mesecno_dobit,
             'mesec': mesec,
             'godina': godina,
+            'ukupna_dobit': ukupna_dobit,
+            'ukupni_prihodi': ukupni_prihodi,
+            'ukupni_rashodi': ukupni_rashodi
         })
 
 

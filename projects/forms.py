@@ -46,7 +46,7 @@ class VoziloForm(forms.ModelForm):
     registracija_istice = forms.DateField(
         widget=forms.DateInput(format='%d.%m.%Y', attrs={'class': "datum"}), input_formats=('%d.%m.%Y', '%d/%m/%Y', '%d.%m.%y', '%d/%m/%y'))
     sledeci_servis = forms.DateField(
-        widget=forms.DateInput(format='%d.%m.%Y', attrs={'class': "datum"}), input_formats=('%d.%m.%Y', '%d/%m/%Y', '%d.%m.%y', '%d/%m/%y'))
+        widget=forms.DateInput(format='%d.%m.%Y', attrs={'class': "datum"}), input_formats=('%d.%m.%Y', '%d/%m/%Y', '%d.%m.%y', '%d/%m/%y'), required=False)
     class Meta:
         model = Vozilo
         fields = ['marka', 'predjeni_kilometri', 'registracija_istice', 'sledeci_servis', 'potrosnja_goriva', 'trenutno_duzi', 'opis']

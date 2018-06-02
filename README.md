@@ -31,7 +31,6 @@ pregledati titlove
 
 
 - potrebni komentari za posao ili polje u bazi ili word dokument u file field.  (ok, ali mozda posebno model komentar pa vezan za posao, tako bi bilo vise mogucnosti!)
-- finansije -> sve poslove koji trenutno imaju radnike (izabrati mesec kao kod radnika) svaki prihod i rashod mora imati polje datum. i na automatsku satnicu dodati datum
 - dogovoreno po kvadratu???
 
 
@@ -47,6 +46,7 @@ pregledati titlove
 - mesecni pregled radnika akontacija + ishrana, neto ld.  --  ok
 - mozda model akontacija: polja: radnik, mesec, godina.  --  ok
 - ukupna kolicina troskova za vozilo -- ok
+- finansije -> sve poslove koji trenutno imaju radnike (izabrati mesec kao kod radnika) svaki prihod i rashod mora imati polje datum. i na automatsku satnicu dodati datum   --  ok
 
 
 - onemoguceno dodavanje na posao kroz objekat radnih, dakle MOOORA kroz posao...!!!!!!

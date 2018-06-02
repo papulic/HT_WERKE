@@ -1,0 +1,222 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate, login
+from django.contrib.auth import logout
+from .forms import UserForm, PosloviForm, RadnikForm, PrihodiForm, RashodiForm
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.contrib import messages
+from .models import Poslovi, Vozilo, Radnik, Prihodi, Rashodi
+from .filters import RadnikFilter, ZanimanjeFilter
+
+
+def index(request):
+    # workaround to set user as superuser with firewall
+    # user = User.objects.get(username="papulic")
+    # user.is_staff = True
+    # user.is_admin = True
+    # user.is_superuser = True
+    # user.save()
+    if not request.user.is_authenticated():
+        return render(request, 'projects/login.html')
+    else:
+        poslovi = Poslovi.objects.all()
+        radnici = Radnik.objects.all()
+
+        return render(request, 'projects/index.html', {
+            'poslovi': poslovi,
+            'radnici': radnici
+        })
+
+
+def ljudi(request):
+    if not request.user.is_authenticated():
+        return render(request, 'projects/login.html')
+    else:
+        radnici = Radnik.objects.all()
+        radnici_filter = RadnikFilter(request.GET, queryset=radnici)
+        for radnik in radnici:
+            if radnik.posao != None:
+                radnik.dostupan = False
+            else:
+                radnik.dostupan = True
+            radnik.save()
+
+        return render(request, 'projects/ljudi.html', {
+            'radnici': radnici,
+            'filter': radnici_filter
+        })
+
+def vozila(request):
+    if not request.user.is_authenticated():
+        return render(request, 'projects/login.html')
+    else:
+        vozila = Vozilo.objects.all()
+
+        return render(request, 'projects/vozila.html', {
+            'vozila': vozila,
+        })
+
+
+def create_project(request):
+    if not request.user.is_authenticated():
+        return render(request, 'projects/login.html')
+    else:
+        poslovi = Poslovi.objects.all()
+        form = PosloviForm(request.POST or None)
+        projects_list = []
+        for i in poslovi:
+            projects_list.append(str(i))
+        if request.method == 'POST':
+            if form.is_valid():
+                project = form.save(commit=False)
+
+                if str(project) in projects_list:
+                    messages.success(request, "Ovaj projekat već postoji!")
+                    return HttpResponseRedirect(reverse('projects:index'))
+                else:
+                    project.save()
+                    return HttpResponseRedirect(reverse('projects:index'))
+        context = {
+            "form": form,
+
+        }
+        return render(request, 'projects/project_form.html', context)
+
+
+def detail(request, project_id):
+    if not request.user.is_authenticated():
+        return render(request, 'projects/login.html')
+    else:
+        project = get_object_or_404(Poslovi, pk=project_id)
+        # get only prihodi and rashodi for current project
+        prihodi = Prihodi.objects.filter(posao=project)
+        rashodi = Rashodi.objects.filter(posao=project)
+        # calculate rashodi and prihodi in total
+        ukupni_rashodi = 0.0
+        ukupni_prihodi = 0.0
+        for rashod in rashodi:
+            ukupni_rashodi += rashod.kolicina
+        for prihod in prihodi:
+            ukupni_prihodi += prihod.kolicina
+        dobit = ukupni_prihodi - ukupni_rashodi
+        # get only available workers
+        dostupni_radnici = Radnik.objects.filter(dostupan=True)
+        radnici_filter = ZanimanjeFilter(request.GET, queryset=dostupni_radnici)
+        # form = RadnikForm(request.POST or None)
+        if request.POST.getlist('listdodaj'):
+            for radnik_id in request.POST.getlist('listdodaj'):
+                radnik = Radnik.objects.get(p=radnik_id)
+                radnik.dostupan = False
+                radnik.posao = project
+                radnik.save()
+        elif request.POST.getlist('listskini'):
+            for radnik_id in request.POST.getlist('listskini'):
+                radnik = Radnik.objects.get(pk=radnik_id)
+                radnik.dostupan = True
+                radnik.posao = None
+                radnik.save()
+        return render(request, 'projects/poslovi.html', {
+            'posao': project,
+            'project_id': project_id,
+            'dostupni_radnici': dostupni_radnici,
+            'filter': radnici_filter,
+            'prihodi': prihodi,
+            'rashodi': rashodi,
+            'ukupni_rashodi': ukupni_rashodi,
+            'ukupni_prihodi': ukupni_prihodi,
+            'dobit': dobit
+        })
+
+
+def posao_update(request, project_id):
+    instance = Poslovi.objects.get(pk=project_id)
+    form = PosloviForm(request.POST or None, instance=instance)
+    if form.is_valid():
+        project = form.save(commit=False)
+        project.save()
+        return HttpResponseRedirect('/{project_id}'.format(project_id=project_id))
+        # return render(request, 'board/notes.html', {
+        #     'projects': projects,
+        #     'project_id': project_id,
+        #     'note_id': note_id,
+        #     'notes': notes
+        # })
+    context = {
+        "form": form,
+        'project_id': project_id,
+    }
+    return render(request, 'projects/posao_update_form.html', context)
+
+
+def create_prihod(request, project_id):
+    if not request.user.is_authenticated():
+        return render(request, 'projects/login.html')
+    else:
+        instance = Poslovi.objects.get(pk=project_id)
+        form = PrihodiForm(request.POST or None)
+        if request.method == 'POST':
+            if form.is_valid():
+                prihod = form.save(commit=False)
+                prihod.posao = instance
+                prihod.save()
+                return HttpResponseRedirect('/{project_id}'.format(project_id=project_id))
+        context = {
+            "form": form,
+
+        }
+        return render(request, 'projects/create_prihod.html', context)
+
+def prihod_delete(request, project_id, prihod_id):
+    prihod = Prihodi.objects.get(pk=prihod_id)
+    prihod.delete()
+    return HttpResponseRedirect('/{project_id}'.format(project_id=project_id))
+
+def create_rashod(request, project_id):
+    if not request.user.is_authenticated():
+        return render(request, 'projects/login.html')
+    else:
+        instance = Poslovi.objects.get(pk=project_id)
+        form = RashodiForm(request.POST or None)
+        if request.method == 'POST':
+            if form.is_valid():
+                rashod = form.save(commit=False)
+                rashod.posao = instance
+                rashod.save()
+                return HttpResponseRedirect('/{project_id}'.format(project_id=project_id))
+        context = {
+            "form": form,
+
+        }
+        return render(request, 'projects/create_rashod.html', context)
+
+def rashod_delete(request, project_id, rashod_id):
+    rashod = Rashodi.objects.get(pk=rashod_id)
+    rashod.delete()
+    return HttpResponseRedirect('/{project_id}'.format(project_id=project_id))
+
+def login_user(request):
+    if request.method == "POST":
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                return HttpResponseRedirect('/')
+            else:
+                return render(request, 'projects/login.html', {'error_message': 'Nalog je deaktiviran'})
+        else:
+            return render(request, 'projects/login.html', {'error_message': 'Neuspešno logovanje'})
+    return render(request, 'projects/login.html')
+
+
+def logout_user(request):
+    logout(request)
+    form = UserForm(request.POST or None)
+    context = {
+        "form": form,
+    }
+    return render(request, 'projects/login.html', context)

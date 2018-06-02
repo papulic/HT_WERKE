@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 from django.db import models
+
 
 class Poslovi(models.Model):
     ime = models.CharField(max_length=30)
@@ -18,13 +18,16 @@ class Poslovi(models.Model):
     class Meta:
         verbose_name_plural = "Poslovi"
 
+
 class Zanimanja(models.Model):
     zanimanje = models.CharField(max_length=30)
 
     def __unicode__(self):
         return self.zanimanje
+
     class Meta:
         verbose_name_plural = "Zanimanja"
+
 
 class Radnik(models.Model):
     ime = models.CharField(max_length=50)
@@ -50,28 +53,21 @@ class Radnik(models.Model):
         verbose_name_plural = "Radnici"
 
 
-
-
-#class RadniciZanimanja(models.Model):
-#    radnik = models.ForeignKey(Radnik, on_delete=models.CASCADE)
-#    zanimanje = models.ForeignKey(Zanimanja, on_delete=models.CASCADE)
-
-# created_at = models.DateTimeField(auto_now_add=True)
 class Vozilo(models.Model):
     marka = models.CharField(max_length=30)
     predjeni_kilometri = models.IntegerField(default=None, null=True, blank=True)
     registracija_istice = models.DateField()
-    sledeci_servis = models.DateField()
+    sledeci_servis = models.DateField(null=True, blank=True)
     potrosnja_goriva = models.FloatField(max_length=10, default=0.0)
     opis = models.CharField(max_length=100, blank=True)
     trenutno_duzi = models.ForeignKey(Radnik, null=True, blank=True)
-
 
     def __unicode__(self):
         return self.marka
 
     class Meta:
         verbose_name_plural = "Vozila"
+
 
 class Dan(models.Model):
     datum = models.DateField()
@@ -89,6 +85,7 @@ class Dan(models.Model):
     class Meta:
         verbose_name_plural = "Dani"
 
+
 class Prihodi(models.Model):
     datum = models.DateField()
     vrsta = models.CharField(max_length=150)
@@ -100,6 +97,7 @@ class Prihodi(models.Model):
 
     class Meta:
         verbose_name_plural = "Prihodi"
+
 
 class Rashodi(models.Model):
     datum = models.DateField()
@@ -113,6 +111,7 @@ class Rashodi(models.Model):
 
     class Meta:
         verbose_name_plural = "Rashodi"
+
 
 class Akontacije(models.Model):
     godina = models.IntegerField()
