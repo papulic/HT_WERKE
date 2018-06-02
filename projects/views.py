@@ -4,11 +4,11 @@ from __future__ import unicode_literals
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
-from .forms import UserForm, PosloviForm, RadnikForm, PrihodiForm, RashodiForm, DatumForm, DanForm, ZanimanjeForm, VoziloForm, AkontacijeForm, Datum_finansForm, KvadratForm
+from .forms import UserForm, PosloviForm, RadnikForm, PrihodiForm, RashodiForm, DatumForm, DanForm, ZanimanjeForm, VoziloForm, AkontacijeForm, Datum_finansForm, KvadratForm, KomentarForm
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
-from .models import Poslovi, Vozilo, Radnik, Prihodi, Rashodi, Zanimanja, Dan, Akontacije
+from .models import Poslovi, Vozilo, Radnik, Prihodi, Rashodi, Zanimanja, Dan, Akontacije, Komentar
 from .filters import RadnikFilter, ZanimanjeFilter
 import datetime
 import calendar
@@ -642,6 +642,54 @@ def create_rashod(request, project_id):
 def rashod_delete(request, project_id, rashod_id):
     rashod = Rashodi.objects.get(pk=rashod_id)
     rashod.delete()
+    return HttpResponseRedirect(reverse('projects:posao', args=(project_id)))
+
+def create_komentar(request, project_id):
+    if not request.user.is_authenticated():
+        return render(request, 'projects/login.html')
+    else:
+        instance = Poslovi.objects.get(pk=project_id)
+        form = KomentarForm(request.POST or None)
+        if request.method == 'POST':
+            if form.is_valid():
+                komentar = form.save(commit=False)
+                komentar.posao = instance
+                komentar.save()
+                return HttpResponseRedirect(reverse('projects:posao', args=(project_id)))
+        context = {
+            "form": form,
+        }
+        return render(request, 'projects/create_komentar.html', context)
+
+
+def komentar_detail(request, komentar_id):
+    if not request.user.is_authenticated():
+        return render(request, 'projects/login.html')
+    else:
+        komentar = get_object_or_404(Komentar, pk=komentar_id)
+        return render(request, 'projects/komentar_detalji.html', {
+            'komentar': komentar
+        })
+
+
+def komentar_update(request, komentar_id):
+    instance = Komentar.objects.get(pk=komentar_id)
+    form = KomentarForm(request.POST or None, instance=instance)
+    if form.is_valid():
+        komentar = form.save(commit=False)
+        komentar.save()
+        messages.success(request, "Komentar je izmenjen!")
+        return HttpResponseRedirect(reverse('projects:komentar-detail', args=(komentar_id)))
+    context = {
+        "form": form,
+        'komentar': komentar_id,
+    }
+    return render(request, 'projects/komentar_update.html', context)
+
+
+def komentar_delete(request, project_id, komentar_id):
+    komentar = Komentar.objects.get(pk=komentar_id)
+    komentar.delete()
     return HttpResponseRedirect(reverse('projects:posao', args=(project_id)))
 
 

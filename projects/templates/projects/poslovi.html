@@ -9,39 +9,43 @@
 
     {% endif %}
 
-     <div class="col-sm-12">
-         <br>
-         <a href="{% url 'projects:posao-update' project_id %}">
-            <button type="button" class="btn btn-primary">
-                <span class="glyphicon glyphicon-pencil"></span>&nbsp; Promeni detalje o projektu
-            </button>
-         </a>
-         <a href="{% url 'projects:prihod-add' project_id %}">
-            <button type="button" class="btn btn-success">
-                <span class="glyphicon glyphicon-plus-sign"></span>&nbsp; Dodaj prihod
-            </button>
-         </a>
-         <a href="{% url 'projects:rashod-add' project_id %}">
-            <button type="button" class="btn btn-danger">
-                <span class="glyphicon glyphicon-plus-sign"></span>&nbsp; Dodaj rashod
-            </button>
-         </a>
-         {% if posao.dogovoreno_po_kvadratu != 0.0 %}
-         <a href="{% url 'projects:kvadrat-add' project_id %}">
-            <button type="button" class="btn btn-warning">
-                <span class="glyphicon glyphicon-plus-sign"></span>&nbsp; Dodaj kvadrate
-            </button>
-         </a>
-         {% endif %}
-     </div>
-    <!-- Modal -->
-<div id="myModal" class="modal fade" role="dialog">
-  <div class="modal-dialog">
+        <div class="col-sm-12 form-group">
+
+            <br>
+             <a href="{% url 'projects:posao-update' project_id %}">
+                <button type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-pencil"></span>&nbsp; Promeni detalje o projektu
+                </button>
+             </a>
+            <a href="{% url 'projects:komentar-add' project_id %}">
+                <button type="button" class="btn btn-light">
+                    <span class="glyphicon glyphicon-pencil"></span>&nbsp; Dodaj komentar
+                </button>
+            </a>
+        </div>
 
 
+         <div class="col-sm-12">
+             <a href="{% url 'projects:prihod-add' project_id %}">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-plus-sign"></span>&nbsp; Dodaj prihod
+                </button>
+             </a>
+             <a href="{% url 'projects:rashod-add' project_id %}">
+                <button type="button" class="btn btn-danger">
+                    <span class="glyphicon glyphicon-plus-sign"></span>&nbsp; Dodaj rashod
+                </button>
+             </a>
+             {% if posao.dogovoreno_po_kvadratu != 0.0 %}
+             <a href="{% url 'projects:kvadrat-add' project_id %}">
+                <button type="button" class="btn btn-warning">
+                    <span class="glyphicon glyphicon-plus-sign"></span>&nbsp; Dodaj kvadrate
+                </button>
+             </a>
+             {% endif %}
+         </div>
 
-  </div>
-</div>
+
      <div class="col-sm-8">
          <div class="well">
             <div class="row">
@@ -90,7 +94,7 @@
                     <td>
                         <a href="{% url 'projects:rashod-delete' project_id rashod.id %}">
                             <button type="button" class="btn btn-danger" onclick="clicked(event)" style="float: right">
-                                <span class="glyphicon glyphicon-plus-sign"></span>&nbsp; Obrisi rashod
+                                <span class="glyphicon glyphicon-trash"></span>
                             </button>
                         </a>
                     </td>
@@ -125,7 +129,7 @@
                     <td>
                         <a href="{% url 'projects:prihod-delete' project_id prihod.id %}">
                             <button type="button" class="btn btn-danger" onclick="clicked(event)" style="float: right">
-                                <span class="glyphicon glyphicon-plus-sign"></span>&nbsp; Obrisi prihod
+                                <span class="glyphicon glyphicon-trash"></span>
                             </button>
                         </a>
                     </td>
@@ -173,8 +177,33 @@
                  </table>
              </div>
          </form>
-         <h4>Komentar:</h4>
-         <p>{{ posao.komentar }}</p>
+         <div class="table-div bottom-border">
+             <table class="table">
+                <thead>
+                <tr>
+                    <th>Komentari</th>
+                    <th>Datum</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for komentar in posao.komentar_set.all %}
+                <tr>
+                    <td class="skraceni_tekst"><a href="{% url 'projects:komentar-detail' komentar.id %}">{{ komentar.komentar }}</a></td>
+                    <td>{{ komentar.datum }}</td>
+                    <td>{{ prihod.kolicina }}</td>
+                    <td>
+                        <a href="{% url 'projects:komentar-delete' project_id komentar.id %}">
+                            <button type="button" class="btn btn-danger" onclick="clicked(event)">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+             </table>
+         </div>
      </div>
      <div class="col-sm-4 left-border">
          <h3>Dostupni radnici</h3>

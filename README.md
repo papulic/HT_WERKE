@@ -29,13 +29,11 @@ pregledati titlove
 
 
 
-- delete posao create log
-- potrebni komentari za posao ili polje u bazi ili word dokument u file field.
-(ok, ali mozda posebno model komentar pa vezan za posao, tako bi bilo vise mogucnosti! poslovi -->  dodaj komentar)
+- delete posao create log  AKO JE STARIJI OD DVE GODINE prvo ucitati te poslove pa redirect na default index page
 
 
 - na listi vozila izbaciti kilometre i potrosnju  --  ok
-- filter radnika na mesecnom izvodu po zanimanju i poslu.  --  ok, samo po poslu receno da je dovoljno  (testirati odakle krece autoincrement)
+- filter radnika na mesecnom izvodu po poslu.  --  ok (testirati odakle krece autoincrement)
 - pregled ukupnog rada od pocetka radnog odnosa za svaki mesec koliko danaa radnih, bolovanja, odmora i nedozvoljenog odstustva,
  kad se udje u detalje radnika na dnu stranice  -- ok
 - Izbaciti da mora upisati opis posla -- ok
@@ -48,5 +46,6 @@ pregledati titlove
 - ukupna kolicina troskova za vozilo -- ok
 - finansije -> sve poslove koji trenutno imaju radnike (izabrati mesec kao kod radnika) svaki prihod i rashod mora imati polje datum. i na automatsku satnicu dodati datum   --  ok
 - dogovoreno po kvadratu  --  ok  (automatsi racunanje prihoda)
+- potrebni komentari za posao ili polje u bazi ili word dokument u file field.  --  ok
 
 - onemoguceno dodavanje na posao kroz objekat radnih, dakle MOOORA kroz posao...!!!!!!

@@ -10,7 +10,6 @@ class Poslovi(models.Model):
     dogovoreno_po_kvadratu = models.FloatField(default=0.0)
     pocetak_radova = models.DateField()
     kraj_radova = models.DateField(null=True, blank=True)
-    komentar = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
         return self.ime
@@ -124,3 +123,14 @@ class Akontacije(models.Model):
 
     class Meta:
         verbose_name_plural = "Akontacije"
+
+class Komentar(models.Model):
+    datum = models.DateField(null=True, blank=True)
+    komentar = models.TextField()
+    posao = models.ForeignKey(Poslovi, on_delete=models.CASCADE)
+
+    def __unicode__(self):
+        return str(self.posao)
+
+    class Meta:
+        verbose_name_plural = "Komentari"

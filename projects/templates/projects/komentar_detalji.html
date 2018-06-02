@@ -1,0 +1,28 @@
+{% extends 'projects/base.html' %}
+{% block title %} - Komentar {% endblock %}
+{% block projects_active %}active{% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li style="color:red;" {% if message.tags == "success" %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    </div>
+    <div class="row">
+        <h3> Komentar za {{ komentar.posao.ime }}
+            <a href="{% url 'projects:komentar-update' komentar.id %}">
+                <button type="button" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-pencil"></span>&nbsp; Izmeni komentar
+                </button>
+            </a>
+        </h3>
+        <h3>{{ komentar.datum }}</h3>
+        <h4>{{ komentar.komentar }}</h4>
+    </div>
+</div>
+{% endblock %}

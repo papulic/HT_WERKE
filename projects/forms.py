@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Poslovi, Vozilo, Radnik, Prihodi, Rashodi, Dan, Zanimanja, Akontacije
+from .models import Poslovi, Vozilo, Radnik, Prihodi, Rashodi, Dan, Zanimanja, Akontacije, Komentar
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -27,7 +27,7 @@ class PosloviForm(forms.ModelForm):
         required=False)
     class Meta:
         model = Poslovi
-        fields = ['ime', 'opis', 'dogovoreni_radni_sati', 'dogovoreno_po_kvadratu', 'pocetak_radova', 'kraj_radova', 'komentar']
+        fields = ['ime', 'opis', 'dogovoreni_radni_sati', 'dogovoreno_po_kvadratu', 'pocetak_radova', 'kraj_radova']
 
 class RadnikForm(forms.ModelForm):
     poceo_raditi = forms.DateField(
@@ -106,3 +106,12 @@ class AkontacijeForm(forms.ModelForm):
     class Meta:
         model = Akontacije
         fields = ['kolicina']
+
+class KomentarForm(forms.ModelForm):
+    datum = forms.DateField(
+        widget=forms.DateInput(format='%d.%m.%Y', attrs={'class': "datum"}),
+        input_formats=('%d.%m.%Y', '%d/%m/%Y', '%d.%m.%y', '%d/%m/%y'),
+        required=False)
+    class Meta:
+        model = Komentar
+        fields = ['datum', 'komentar']

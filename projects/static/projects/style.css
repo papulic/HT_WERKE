@@ -17,3 +17,10 @@ body{
 .bottom-border {
   border-bottom: 1px solid #ccc;
 }
+
+.skraceni_tekst {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 55ch;
+}
