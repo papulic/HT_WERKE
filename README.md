@@ -49,3 +49,4 @@ pregledati titlove
 - potrebni komentari za posao ili polje u bazi ili word dokument u file field.  --  ok
 
 - onemoguceno dodavanje na posao kroz objekat radnih, dakle MOOORA kroz posao...!!!!!!
+- Ako je datum veci od kraja projekta, radnici se ne mogu dodati vise!
