@@ -29,9 +29,8 @@ pregledati titlove
 
 
 
-
+- delete posao create log
 - potrebni komentari za posao ili polje u bazi ili word dokument u file field.  (ok, ali mozda posebno model komentar pa vezan za posao, tako bi bilo vise mogucnosti!)
-- dogovoreno po kvadratu???
 
 
 - na listi vozila izbaciti kilometre i potrosnju  --  ok
@@ -47,6 +46,6 @@ pregledati titlove
 - mozda model akontacija: polja: radnik, mesec, godina.  --  ok
 - ukupna kolicina troskova za vozilo -- ok
 - finansije -> sve poslove koji trenutno imaju radnike (izabrati mesec kao kod radnika) svaki prihod i rashod mora imati polje datum. i na automatsku satnicu dodati datum   --  ok
-
+- dogovoreno po kvadratu  --  ok  (automatsi racunanje prihoda)
 
 - onemoguceno dodavanje na posao kroz objekat radnih, dakle MOOORA kroz posao...!!!!!!

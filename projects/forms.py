@@ -80,6 +80,14 @@ class RashodiForm(forms.ModelForm):
         model = Rashodi
         fields = ['datum', 'vrsta', 'kolicina', 'vozilo']
 
+
+class KvadratForm(forms.Form):
+    datum = forms.DateField(
+        widget=forms.DateInput(format='%d.%m.%Y', attrs={'class': "datum"}),
+        input_formats=('%d.%m.%Y', '%d/%m/%Y', '%d.%m.%y', '%d/%m/%y'))
+    kolicina = forms.FloatField(label="kolicina")
+
+
 class DatumForm(forms.Form):
     mesec = forms.IntegerField(max_value=12, min_value=1)
     godina = forms.IntegerField(label="godina")

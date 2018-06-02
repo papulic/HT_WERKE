@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
-from .forms import UserForm, PosloviForm, RadnikForm, PrihodiForm, RashodiForm, DatumForm, DanForm, ZanimanjeForm, VoziloForm, AkontacijeForm, Datum_finansForm
+from .forms import UserForm, PosloviForm, RadnikForm, PrihodiForm, RashodiForm, DatumForm, DanForm, ZanimanjeForm, VoziloForm, AkontacijeForm, Datum_finansForm, KvadratForm
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
@@ -643,6 +643,31 @@ def rashod_delete(request, project_id, rashod_id):
     rashod = Rashodi.objects.get(pk=rashod_id)
     rashod.delete()
     return HttpResponseRedirect(reverse('projects:posao', args=(project_id)))
+
+
+def create_kvadrat(request, project_id):
+    if not request.user.is_authenticated():
+        return render(request, 'projects/login.html')
+    else:
+        instance = Poslovi.objects.get(pk=project_id)
+        form = KvadratForm(request.POST or None)
+        if request.method == 'POST':
+            if form.is_valid():
+                data = form.cleaned_data
+                datum = data['datum']
+                kolicina = data['kolicina']
+                prihod = Prihodi()
+                prihod.posao = instance
+                prihod.datum = datum
+                prihod.vrsta = "{kolicina} KVADRATA URADJENO".format(kolicina=kolicina)
+                prihod.kolicina = kolicina * instance.dogovoreno_po_kvadratu
+                prihod.save()
+                return HttpResponseRedirect(reverse('projects:posao', args=(project_id)))
+        context = {
+            "form": form,
+
+        }
+        return render(request, 'projects/create_rashod.html', context)
 
 
 def delete_posao_and_create_log(request, posao):

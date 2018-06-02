@@ -26,6 +26,13 @@
                 <span class="glyphicon glyphicon-plus-sign"></span>&nbsp; Dodaj rashod
             </button>
          </a>
+         {% if posao.dogovoreno_po_kvadratu != 0.0 %}
+         <a href="{% url 'projects:kvadrat-add' project_id %}">
+            <button type="button" class="btn btn-warning">
+                <span class="glyphicon glyphicon-plus-sign"></span>&nbsp; Dodaj kvadrate
+            </button>
+         </a>
+         {% endif %}
      </div>
     <!-- Modal -->
 <div id="myModal" class="modal fade" role="dialog">
@@ -63,8 +70,9 @@
                 <thead>
                 <tr>
                     <th><font color="red">Rashodi</font></th>
-                    <th></th>
-                    <th></th>
+                    <th>Vozilo</th>
+                    <th>Datum</th>
+                    <th>Količina</th>
                     <th></th>
                 </tr>
                 </thead>
@@ -75,8 +83,9 @@
                     {% if rashod.vozilo %}
                     <td>{{ rashod.vozilo }}</td>
                     {% else %}
-                    <td></td>
+                    <td>---</td>
                     {% endif %}
+                    <td>{{ rashod.datum }}</td>
                     <td>{{ rashod.kolicina }}</td>
                     <td>
                         <a href="{% url 'projects:rashod-delete' project_id rashod.id %}">
@@ -87,9 +96,13 @@
                     </td>
                 </tr>
                 {% endfor %}
-                <td><strong>Ukupni rashodi:</strong></td>
-                <td></td>
-                <td><strong>{{ ukupni_rashodi }}</strong></td>
+                <tr>
+                    <td><strong>Ukupni rashodi:</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><strong>{{ ukupni_rashodi }}</strong></td>
+                </tr>
                 </tbody>
              </table>
          </div>
@@ -98,7 +111,8 @@
                 <thead>
                 <tr>
                     <th><font color="green">Prihodi</font></th>
-                    <th></th>
+                    <th>Datum</th>
+                    <th>Količina</th>
                     <th></th>
                 </tr>
                 </thead>
@@ -106,6 +120,7 @@
                 {% for prihod in prihodi %}
                 <tr class="success">
                     <td>{{ prihod.vrsta }}</td>
+                    <td>{{ prihod.datum }}</td>
                     <td>{{ prihod.kolicina }}</td>
                     <td>
                         <a href="{% url 'projects:prihod-delete' project_id prihod.id %}">
@@ -116,9 +131,12 @@
                     </td>
                 </tr>
                 {% endfor %}
-                <td><strong>Ukupni prihodi:</strong></td>
-                <td></td>
-                <td><strong>{{ ukupni_prihodi }}</strong></td>
+                <tr>
+                    <td><strong>Ukupni prihodi:</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td><strong>{{ ukupni_prihodi }}</strong></td>
+                </tr>
                 </tbody>
              </table>
          </div>
