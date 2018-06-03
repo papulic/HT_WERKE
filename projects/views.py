@@ -5,13 +5,81 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
 from .forms import UserForm, PosloviForm, RadnikForm, PrihodiForm, RashodiForm, DatumForm, DanForm, ZanimanjeForm, VoziloForm, AkontacijeForm, Datum_finansForm, KvadratForm, KomentarForm
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.contrib import messages
 from .models import Poslovi, Vozilo, Radnik, Prihodi, Rashodi, Zanimanja, Dan, Akontacije, Komentar
 from .filters import RadnikFilter, ZanimanjeFilter
 import datetime
-import calendar
+from reportlab.pdfgen import canvas
+
+
+def pdf_posao(request, posao_id):
+    posao = Poslovi.objects.get(id=posao_id)
+    if posao.kraj_radova != None:
+        prihodi = posao.prihodi_set.all()
+        rashodi = posao.rashodi_set.all()
+        dani = Dan.objects.filter(posao=posao)
+        # Create the HttpResponse object with the appropriate PDF headers.
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="{posao}.pdf"'.format(posao=posao.ime)
+
+        # Create the PDF object, using the response object as its "file."
+        p = canvas.Canvas(response)
+        # pagesize=(595.27,841.89)
+        # Draw things on the PDF. Here's where the PDF generation happens.
+        # See the ReportLab documentation for the full list of functionality.
+        prvi_red = "{posao} - {opis}".format(posao=posao.ime, opis=posao.opis)
+        drugi_red = "{pd} - {kd}  Dogovoreno na radni sat: {sat}, dogovoreno po kvadratu: {kv}".format(pd=posao.pocetak_radova.strftime('%d.%m.%Y'), kd=posao.kraj_radova.strftime('%d.%m.%Y'), sat=posao.dogovoreni_radni_sati, kv=posao.dogovoreno_po_kvadratu)
+        p.drawString(50, 820, prvi_red)
+        # p.setStrokeColorRGB(0, 1, 0.3)  # choose your line color
+        p.line(45, 815, 570, 815)
+        p.setFontSize(10)
+        p.drawString(50, 800, drugi_red)
+        p.drawString(60, 780, "Prihodi:")
+        p.drawString(290, 780, "Rashodi:")
+        p.line(60, 775, 210, 775)
+        p.line(290, 775, 440, 775)
+        p.setFontSize(7)
+        y_prihodi = 765
+        y_rashodi = 765
+        svi_prihodi = 0.0
+        svi_rashodi = 0.0
+        for prihod in prihodi:
+            svi_prihodi += prihod.kolicina
+            if len(prihod.vrsta) > 25:
+                prihod.vrsta = prihod.vrsta[:25] + "..."
+            string = "{k} - {p}".format(k=prihod.kolicina, p=prihod.vrsta)
+            p.drawString(60, y_prihodi, string)
+            y_prihodi -= 10
+        for rashod in rashodi:
+            svi_rashodi += rashod.kolicina
+            if len(rashod.vrsta) > 25:
+                rashod.vrsta = rashod.vrsta[:25] + "..."
+            string = "{k} - {p}".format(k=rashod.kolicina, p=rashod.vrsta)
+            p.drawString(290, y_rashodi, string)
+            y_rashodi -= 10
+        if y_prihodi < y_rashodi:
+            y_ukupno = y_prihodi - 5
+        else:
+            y_ukupno = y_rashodi - 5
+        p.line(60, y_ukupno + 10, 210, y_ukupno + 10)
+        p.line(290, y_ukupno + 10, 440, y_ukupno + 10)
+        p.drawString(60, y_ukupno, "Ukupno: {svi_prihodi}".format(svi_prihodi=svi_prihodi))
+        p.drawString(290, y_ukupno, "Ukupno: {svi_rashodi}".format(svi_rashodi=svi_rashodi))
+
+        a = 50 * "a"
+        p.drawString(60, y_ukupno - 10, a)
+
+
+
+        # Close the PDF object cleanly, and we're done.
+        p.showPage()
+        p.save()
+        return response
+    else:
+        messages.success(request, "Posao {posao} još nije završen, izveštaj možete napraviti tek kada posao ima datum kraja radova!".format(posao=posao.ime))
+        return HttpResponseRedirect(reverse('projects:index'))
 
 
 def index(request):
@@ -523,21 +591,22 @@ def dan_update(request, dan_id, posao_id):
                 if old_radio_sati != 0.0 and rashod.kolicina != dan.radio_sati * dan.radnik.satnica:
                     rashod.kolicina -= old_radio_sati * dan.radnik.satnica
                 rashod.save()
-                try:
-                    rashod_ishrana = Rashodi.objects.get(vrsta="ISHRANA_RADNIKA_{id}_{p}_{m}_{g}".format(p=dan.posao.ime, id=dan.posao.id, m=dan.datum.month, g=dan.datum.year))
-                except:
-                    pass
-                try:
-                    rashod_ishrana.kolicina += dan.ishrana
-                except:
-                    rashod_ishrana = Rashodi()
-                    rashod_ishrana.posao = dan.posao
-                    rashod_ishrana.datum = dan.datum
-                    rashod_ishrana.kolicina = dan.ishrana
-                    rashod_ishrana.vrsta = "ISHRANA_RADNIKA_{id}_{p}_{m}_{g}".format(p=dan.posao.ime, id=dan.posao.id, m=dan.datum.month, g=dan.datum.year)
-                if old_ishrana != 0.0:
-                    rashod_ishrana.kolicina -= old_ishrana
-                rashod_ishrana.save()
+                if dan.ishrana != 0.0:
+                    try:
+                        rashod_ishrana = Rashodi.objects.get(vrsta="ISHRANA_RADNIKA_{id}_{p}_{m}_{g}".format(p=dan.posao.ime, id=dan.posao.id, m=dan.datum.month, g=dan.datum.year))
+                    except:
+                        pass
+                    try:
+                        rashod_ishrana.kolicina += dan.ishrana
+                    except:
+                        rashod_ishrana = Rashodi()
+                        rashod_ishrana.posao = dan.posao
+                        rashod_ishrana.datum = dan.datum
+                        rashod_ishrana.kolicina = dan.ishrana
+                        rashod_ishrana.vrsta = "ISHRANA_RADNIKA_{id}_{p}_{m}_{g}".format(p=dan.posao.ime, id=dan.posao.id, m=dan.datum.month, g=dan.datum.year)
+                    if old_ishrana != 0.0:
+                        rashod_ishrana.kolicina -= old_ishrana
+                    rashod_ishrana.save()
                 ###############################################################
                 if dan.posao.dogovoreni_radni_sati != 0.0:
                     try:

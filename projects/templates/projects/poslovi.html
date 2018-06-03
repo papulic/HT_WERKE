@@ -2,15 +2,19 @@
 {% block title %} - Details {% endblock %}
 {% block projects_active %}active{% endblock %}
 {% block content %}
-
 <div class="container">
     {% if message %}
     <h5 style="color:red;">{{ message }}</h5>
-
+    {% endif %}
+    {% if messages %}
+    <ul class="messages">
+    {% for message in messages %}
+    <li style="color:red;" {% if message.tags == "success" %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+    </ul>
     {% endif %}
 
         <div class="col-sm-12 form-group">
-
             <br>
              <a href="{% url 'projects:posao-update' project_id %}">
                 <button type="button" class="btn btn-primary">

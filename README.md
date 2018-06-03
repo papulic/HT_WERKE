@@ -30,6 +30,7 @@ pregledati titlove
 
 
 - delete posao create log  AKO JE STARIJI OD DVE GODINE prvo ucitati te poslove pa redirect na default index page
+- posebno obrisi, posebno napravi pdf izvestaj
 
 
 - na listi vozila izbaciti kilometre i potrosnju  --  ok
@@ -50,3 +51,5 @@ pregledati titlove
 
 - onemoguceno dodavanje na posao kroz objekat radnih, dakle MOOORA kroz posao...!!!!!!
 - Ako je datum veci od kraja projekta, radnici se ne mogu dodati vise!
+- Posao se ne moze obrisati ako nije postavljen datum na kraj projekta
+- Brisanjem projekta se brisu svi dani, prihodi, rashodi vezani za taj projekat!!

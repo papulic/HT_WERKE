@@ -35,5 +35,6 @@ urlpatterns = [
     url(r'^(?P<project_id>[0-9]+)/obrisi_komentar/(?P<komentar_id>[0-9]+)/$', views.komentar_delete, name='komentar-delete'),
     url(r'^biranje_meseca/$', views.biranje_meseca, name='biranje_meseca'),
     url(r'^biranje_meseca_finansije/$', views.biranje_meseca_za_finansije, name='biranje_meseca_finansije'),
-    url(r'^dodaj_dane/(?P<mesec>[0-9]+)/(?P<godina>[0-9]+)/(?P<posao_id>[a-zA-Z0-9_.-]+)$', views.dodaj_dane, name='dodaj_dane')
+    url(r'^dodaj_dane/(?P<mesec>[0-9]+)/(?P<godina>[0-9]+)/(?P<posao_id>[a-zA-Z0-9_.-]+)$', views.dodaj_dane, name='dodaj_dane'),
+    url(r'^pdf/(?P<posao_id>[0-9]+)$', views.pdf_posao, name='pdf_posao')
 ]
