@@ -30,8 +30,8 @@ pregledati titlove
 
 
 - delete posao create log  AKO JE STARIJI OD DVE GODINE prvo ucitati te poslove pa redirect na default index page
-- posebno obrisi, posebno napravi pdf izvestaj
-- komentare u textbox wrapovano i datum.
+- brisati i akontacije starije od ?  radnike koji nisu u radnom odnosu duze od ?
+- test test test
 
 
 - na listi vozila izbaciti kilometre i potrosnju  --  ok
@@ -49,6 +49,7 @@ pregledati titlove
 - finansije -> sve poslove koji trenutno imaju radnike (izabrati mesec kao kod radnika) svaki prihod i rashod mora imati polje datum. i na automatsku satnicu dodati datum   --  ok
 - dogovoreno po kvadratu  --  ok  (automatsi racunanje prihoda)
 - potrebni komentari za posao ili polje u bazi ili word dokument u file field.  --  ok
+- posebno obrisi, posebno napravi pdf izvestaj -- ok
 
 - onemoguceno dodavanje na posao kroz objekat radnih, dakle MOOORA kroz posao...!!!!!!
 - Ako je datum veci od kraja projekta, radnici se ne mogu dodati vise!

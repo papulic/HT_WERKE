@@ -39,7 +39,7 @@ class Radnik(models.Model):
     satnica = models.FloatField(max_length=10)
     zaduzena_oprema = models.CharField(max_length=100, blank=True)
     dostupan = models.BooleanField(default=True)
-    posao = models.ForeignKey(Poslovi, null=True, blank=True)
+    posao = models.ForeignKey(Poslovi, null=True, blank=True, on_delete=models.SET_NULL)
     u_radnom_odnosu = models.BooleanField(default=True)
     zanimanja = models.ManyToManyField(Zanimanja)
     dana_do_isteka_ugovora = models.IntegerField(default=None, null=True, blank=True)

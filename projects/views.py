@@ -14,12 +14,14 @@ import datetime
 from reportlab.pdfgen import canvas
 
 
-def pdf_posao(request, posao_id, strana=1):
+def pdf_posao(request, posao_id):
     posao = Poslovi.objects.get(id=posao_id)
     if posao.kraj_radova != None:
+        strana = 1
         prihodi = posao.prihodi_set.all()
         rashodi = posao.rashodi_set.all()
         dani = Dan.objects.filter(posao=posao)
+        komentari = Komentar.objects.filter(posao=posao)
         radnici = {}
         sati = 0
         for dan in dani:
@@ -73,7 +75,10 @@ def pdf_posao(request, posao_id, strana=1):
             y -= 10
             if y < 100:
                 y = 800
+                stra = "- {strana} -".format(strana=strana)
+                p.drawString(290, 20, stra)
                 p.showPage()
+                strana += 1
                 p.setFontSize(7)
         p.drawString(60, y, "Ukupno: {svi_prihodi}".format(svi_prihodi=svi_prihodi))
         y -= 10
@@ -92,7 +97,10 @@ def pdf_posao(request, posao_id, strana=1):
             y -= 10
             if y < 100:
                 y = 800
+                stra = "- {strana} -".format(strana=strana)
+                p.drawString(290, 20, stra)
                 p.showPage()
+                strana += 1
                 p.setFontSize(7)
 
         p.drawString(60, y, "Ukupno: {svi_rashodi}".format(svi_rashodi=svi_rashodi))
@@ -102,14 +110,52 @@ def pdf_posao(request, posao_id, strana=1):
         dobit = "Dobit: {dobit}".format(dobit=svi_prihodi - svi_rashodi)
         y -= 15
         p.drawString(60, y, dobit)
-
-
+        y -= 15
+        p.line(60, y, 160, y)
+        p.setFontSize(10)
+        y -= 10
+        p.drawString(60, y, "Komentari:")
+        p.line(60, y - 5, 160, y - 5)
+        y -= 15
+        p.setFontSize(7)
+        kom = 1
+        for komentar in komentari:
+            kom_broj = "- {kom} -".format(kom=kom)
+            p.drawString(60, y, kom_broj)
+            y -= 7
+            redovi = [str(komentar.komentar)[x:x+60] for x in xrange(0, len(str(komentar.komentar)), 60)]
+            for red in redovi:
+                p.drawString(70, y, red)
+                y -= 10
+                if y < 100:
+                    y = 800
+                    stra = "- {strana} -".format(strana=strana)
+                    p.drawString(290, 20, stra)
+                    p.showPage()
+                    strana += 1
+                    p.setFontSize(7)
+            kom += 1
         # Close the PDF object cleanly, and we're done.
+        stra = "- {strana} -".format(strana=strana)
+        p.drawString(290, 20, stra)
         p.showPage()
         p.save()
         return response
     else:
         messages.success(request, "Posao {posao} još nije završen, izveštaj možete napraviti tek kada posao ima datum kraja radova!".format(posao=posao.ime))
+        return HttpResponseRedirect(reverse('projects:index'))
+
+
+def posao_delete(request, posao_id):
+    posao = Poslovi.objects.get(id=posao_id)
+    if posao.kraj_radova != None:
+        posao.delete()
+        messages.success(request,
+                         "Posao {posao} je uspešno obrisan iz baze!".format(posao=posao.ime))
+        return HttpResponseRedirect(reverse('projects:index'))
+    else:
+        messages.success(request, "Posao {posao} još nije završen, posao možete obrisati tek kada posao ima datum kraja radova!".format(
+                             posao=posao.ime))
         return HttpResponseRedirect(reverse('projects:index'))
 
 
@@ -387,8 +433,15 @@ def create_zanimanje(request):
     if request.method == 'POST':
         if form.is_valid():
             zanimanje = form.save(commit=False)
-            zanimanje.save()
-            messages.success(request, "Zanimanje '{zanimanje}' je dodato!".format(zanimanje=zanimanje.zanimanje))
+            zanimanja = Zanimanja.objects.all()
+            sva_zanimanja = []
+            for z in zanimanja:
+                sva_zanimanja.append(z.zanimanje.upper())
+            if zanimanje.zanimanje.upper() in sva_zanimanja:
+                messages.success(request, "Zanimanje '{zanimanje}' već postoji!".format(zanimanje=zanimanje.zanimanje))
+            else:
+                zanimanje.save()
+                messages.success(request, "Zanimanje '{zanimanje}' je dodato!".format(zanimanje=zanimanje.zanimanje))
             return HttpResponseRedirect(reverse('projects:ljudi'))
     context = {
         "form": form,
