@@ -14,12 +14,20 @@ import datetime
 from reportlab.pdfgen import canvas
 
 
-def pdf_posao(request, posao_id):
+def pdf_posao(request, posao_id, strana=1):
     posao = Poslovi.objects.get(id=posao_id)
     if posao.kraj_radova != None:
         prihodi = posao.prihodi_set.all()
         rashodi = posao.rashodi_set.all()
         dani = Dan.objects.filter(posao=posao)
+        radnici = {}
+        sati = 0
+        for dan in dani:
+            if dan.radnik.ime not in radnici:
+                radnici[dan.radnik.ime] = dan.radio_sati
+            else:
+                radnici[dan.radnik.ime] += dan.radio_sati
+            sati += dan.radio_sati
         # Create the HttpResponse object with the appropriate PDF headers.
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="{posao}.pdf"'.format(posao=posao.ime)
@@ -36,41 +44,64 @@ def pdf_posao(request, posao_id):
         p.line(45, 815, 570, 815)
         p.setFontSize(10)
         p.drawString(50, 800, drugi_red)
-        p.drawString(60, 780, "Prihodi:")
-        p.drawString(290, 780, "Rashodi:")
-        p.line(60, 775, 210, 775)
-        p.line(290, 775, 440, 775)
+        p.line(60, 795, 500, 795)
+        p.drawString(60, 780, "Radnici koji su radili na projektu:")
         p.setFontSize(7)
-        y_prihodi = 765
-        y_rashodi = 765
+        y_radnici = 765
+        for radnik, sat in radnici.iteritems():
+            string = "{sat} sati - {radnik}".format(sat=sat, radnik=radnik)
+            p.drawString(60, y_radnici, string)
+            y_radnici -= 10
+        string = "Ukupno sati: {sati}".format(sati=sati)
+        p.drawString(60, y_radnici, string)
+        y_radnici -= 15
+        p.line(60, y_radnici, 500, y_radnici)
+        p.setFontSize(10)
+        p.drawString(60, y_radnici - 15, "Prihodi:")
+        p.line(60, y_radnici - 20, 160, y_radnici - 20)
+
+        p.setFontSize(7)
+        y = y_radnici - 30
         svi_prihodi = 0.0
         svi_rashodi = 0.0
         for prihod in prihodi:
             svi_prihodi += prihod.kolicina
-            if len(prihod.vrsta) > 25:
-                prihod.vrsta = prihod.vrsta[:25] + "..."
+            if len(prihod.vrsta) > 60:
+                prihod.vrsta = prihod.vrsta[:60] + "..."
             string = "{k} - {p}".format(k=prihod.kolicina, p=prihod.vrsta)
-            p.drawString(60, y_prihodi, string)
-            y_prihodi -= 10
+            p.drawString(60, y, string)
+            y -= 10
+            if y < 100:
+                y = 800
+                p.showPage()
+                p.setFontSize(7)
+        p.drawString(60, y, "Ukupno: {svi_prihodi}".format(svi_prihodi=svi_prihodi))
+        y -= 10
+        p.line(60, y, 500, y)
+        p.setFontSize(10)
+        p.drawString(60, y - 10, "Rashodi:")
+        p.line(60, y - 15, 160, y - 15)
+        p.setFontSize(7)
+        y = y - 25
         for rashod in rashodi:
             svi_rashodi += rashod.kolicina
-            if len(rashod.vrsta) > 25:
-                rashod.vrsta = rashod.vrsta[:25] + "..."
+            if len(rashod.vrsta) > 60:
+                rashod.vrsta = rashod.vrsta[:60] + "..."
             string = "{k} - {p}".format(k=rashod.kolicina, p=rashod.vrsta)
-            p.drawString(290, y_rashodi, string)
-            y_rashodi -= 10
-        if y_prihodi < y_rashodi:
-            y_ukupno = y_prihodi - 5
-        else:
-            y_ukupno = y_rashodi - 5
-        p.line(60, y_ukupno + 10, 210, y_ukupno + 10)
-        p.line(290, y_ukupno + 10, 440, y_ukupno + 10)
-        p.drawString(60, y_ukupno, "Ukupno: {svi_prihodi}".format(svi_prihodi=svi_prihodi))
-        p.drawString(290, y_ukupno, "Ukupno: {svi_rashodi}".format(svi_rashodi=svi_rashodi))
+            p.drawString(60, y, string)
+            y -= 10
+            if y < 100:
+                y = 800
+                p.showPage()
+                p.setFontSize(7)
 
-        a = 50 * "a"
-        p.drawString(60, y_ukupno - 10, a)
-
+        p.drawString(60, y, "Ukupno: {svi_rashodi}".format(svi_rashodi=svi_rashodi))
+        y -= 10
+        p.line(60, y, 500, y)
+        p.setFontSize(10)
+        dobit = "Dobit: {dobit}".format(dobit=svi_prihodi - svi_rashodi)
+        y -= 15
+        p.drawString(60, y, dobit)
 
 
         # Close the PDF object cleanly, and we're done.

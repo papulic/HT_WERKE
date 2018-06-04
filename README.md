@@ -31,6 +31,7 @@ pregledati titlove
 
 - delete posao create log  AKO JE STARIJI OD DVE GODINE prvo ucitati te poslove pa redirect na default index page
 - posebno obrisi, posebno napravi pdf izvestaj
+- komentare u textbox wrapovano i datum.
 
 
 - na listi vozila izbaciti kilometre i potrosnju  --  ok
