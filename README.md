@@ -19,8 +19,6 @@ ________________________________________________________________________________
 
 da li se pogadja posao na sat za sve radnike na projektu isti, onda automatska satnica ima smisla
 
-def delete posao, pravi se log fajl sa svim detaljima i finansijama o poslu u media dir i odmah se skida (download)
-
 pregledati titlove
 
 
@@ -29,7 +27,7 @@ pregledati titlove
 
 
 
-- delete posao create log  AKO JE STARIJI OD DVE GODINE prvo ucitati te poslove pa redirect na default index page
+
 - brisati i akontacije starije od ?  radnike koji nisu u radnom odnosu duze od ? dane koji su ostali u bazi  (nedelje...)
 mozda sve objekte starije od tri godine?
 - test test test provera svega sto moze ostati u bazi
@@ -51,6 +49,7 @@ mozda sve objekte starije od tri godine?
 - dogovoreno po kvadratu  --  ok  (automatsi racunanje prihoda)
 - potrebni komentari za posao ili polje u bazi ili word dokument u file field.  --  ok
 - posebno obrisi, posebno napravi pdf izvestaj -- ok
+- delete posao create log  AKO JE STARIJI OD DVE GODINE prvo ucitati te poslove pa redirect na default index page  --  ok
 
 
 - onemoguceno dodavanje na posao kroz objekat radnih, dakle MOOORA kroz posao...!!!!!!

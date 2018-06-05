@@ -169,12 +169,20 @@ def index(request):
     if not request.user.is_authenticated():
         return render(request, 'projects/login.html')
     else:
+        current_date = datetime.date.today()
+        poslovi_zavrseni_pre_vise_od_dve_godine = []
         poslovi = Poslovi.objects.all()
         radnici = Radnik.objects.all()
-
+        for posao in poslovi:
+            proslo_dana = posao.kraj_radova - current_date
+            if proslo_dana.days < -730:
+                poslovi_zavrseni_pre_vise_od_dve_godine.append(posao)
+        if len(poslovi_zavrseni_pre_vise_od_dve_godine) > 0:
+            messages.success(request, "U bazi su poslovi stariji od dve godine!")
         return render(request, 'projects/index.html', {
             'poslovi': poslovi,
-            'radnici': radnici
+            'radnici': radnici,
+            'poslovi_zavrseni_pre_vise_od_dve_godine': poslovi_zavrseni_pre_vise_od_dve_godine
         })
 
 
