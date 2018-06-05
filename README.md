@@ -57,3 +57,7 @@ mozda sve objekte starije od tri godine?
 - Posao se ne moze obrisati ako nije postavljen datum na kraj projekta
 - Brisanjem projekta se brisu svi dani, prihodi, rashodi vezani za taj projekat!!
 - Kad se obrise posao, nece se vise precizno videti taj mesec za radnike..
+
+
+
+heroku auth:token
