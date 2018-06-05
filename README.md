@@ -61,3 +61,4 @@ mozda sve objekte starije od tri godine?
 
 
 heroku auth:token
+heroku run:detached your command here
